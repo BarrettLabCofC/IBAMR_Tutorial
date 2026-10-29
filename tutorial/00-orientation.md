@@ -15,13 +15,31 @@ export EXAMPLES_BUILD="$EXAMPLES_SRC/build"
 
 `EXAMPLES_SRC` identifies this repository, and `EXAMPLES_BUILD` identifies its build directory. Application source stays in the repository; compiled programs, run inputs, and output stay under the build directory. Keep quotation marks around paths containing spaces.
 
-Set `IBAMR_ROOT` to your IBAMR installation directory:
+Set `IBAMR_ROOT` to your IBAMR installation directory using either of the following methods.
+
+**If you installed with autoibamr**, load its environment script:
+
+```bash
+source "$HOME/autoibamr/configuration/enable.sh"
+```
+
+This sets `IBAMR_ROOT` and loads the environment for that installation. If your autoibamr installation is in a different directory, use its `configuration/enable.sh` instead.
+
+**To set the path manually**, run:
 
 ```bash
 export IBAMR_ROOT=$HOME/sfw/ibamr/linux-dbg
 ```
 
-Replace `$HOME/sfw/ibamr/linux-dbg` with the path to your installation, containing IBAMR's installed headers and libraries. `$HOME` refers to your home directory. The installation may have been made with autoibamr or built and installed separately. Use the same compiler and MPI environment as that installation. Configure the examples:
+Replace `$HOME/sfw/ibamr/linux-dbg` with your installation directory, containing IBAMR's installed headers and libraries. `$HOME` refers to your home directory. This method works for either an autoibamr installation or an IBAMR installation you built manually. Use the compiler and MPI environment matching that installation.
+
+After either method, check the selected path:
+
+```bash
+echo "$IBAMR_ROOT"
+```
+
+Configure the examples:
 
 ```bash
 cmake -S "$EXAMPLES_SRC" -B "$EXAMPLES_BUILD" \
