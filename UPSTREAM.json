@@ -6,6 +6,23 @@
     },
     "examples/navier_stokes/ex1/input2d": {
       "origin": "IBAMR examples/navier_stokes/ex1/input2d (unchanged; lesson 01 supplies run edits)"
+    },
+    "examples/IB/explicit/ex1/example.cpp": {
+      "origin": "IBAMR examples/IB/explicit/ex1/example.cpp (unchanged)"
+    },
+    "examples/IB/explicit/ex1/curve2d_64.vertex": {
+      "origin": "IBAMR examples/IB/explicit/ex1/curve2d_64.vertex (unchanged)"
+    },
+    "examples/IB/explicit/ex1/curve2d_64.spring": {
+      "origin": "IBAMR examples/IB/explicit/ex1/curve2d_64.spring (unchanged)"
+    },
+    "examples/IB/explicit/ex1/input2d": {
+      "origin": "IBAMR examples/IB/explicit/ex1/input2d",
+      "changes": {
+        "END_TIME": "0.1",
+        "Main.viz_dump_interval": "20",
+        "Main.data_dump_interval": "0"
+      }
     }
   },
   "upstream_version": "0.20.0-pre",

@@ -11,3 +11,7 @@
 
 - Learner lessons live in `tutorial/`, with figures under `tutorial/figures/`. Keep the root README as the overview and entry point.
 - Each “Before moving on” section first summarizes the lesson and what the reader should have, then introduces the next tutorial in a separate one- or two-sentence paragraph.
+
+- Do not include wall-clock run times or estimated learning times in learner documentation. Physical simulation times remain necessary.
+- Each tutorial explains new input blocks, settings, and software mechanisms. Refer back to earlier tutorials for unchanged topics rather than repeating their input blocks or setup explanations.
+- Call the structure in tutorial 04 an elastic rubber band. Keep file and run-directory names unchanged unless their commands and checks are deliberately migrated together.

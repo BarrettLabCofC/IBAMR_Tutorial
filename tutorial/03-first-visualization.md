@@ -93,4 +93,4 @@ If `Omega` is absent, check that you opened the fluid `dumps.visit` from the int
 
 This lesson opened a saved time sequence in VisIt, plotted vorticity and speed, and compared two runs at the same physical time with consistent display settings. You should have saved comparison images for the baseline and higher-viscosity runs at $t=1$, with the input, log, and complete visualization output retained in each run directory.
 
-The next tutorial will add an elastic loop to the fluid simulation. You will view the fluid and structure outputs together at matching times.
+[Tutorial 04](04-elastic-loop.md) will add an elastic rubber band to the fluid simulation. You will view the fluid and structure outputs together at matching times.

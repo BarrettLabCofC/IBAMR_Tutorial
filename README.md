@@ -34,7 +34,7 @@ Replace `$HOME/sfw/ibamr/linux-dbg` with your installation directory, whether in
 
 ## Using the tutorial
 
-Start with [lesson 00](tutorial/00-orientation.md) and work through the lessons in order. Use this repository as your source directory, keep compiled programs and simulation runs under `build/`, and retain separate run directories for comparisons. You will first run the supplied fluid example, then add a kinetic-energy calculation and visualize the results.
+Start with [lesson 00](tutorial/00-orientation.md) and work through the lessons in order. Use this repository as your source directory, keep compiled programs and simulation runs under `build/`, and retain separate run directories for comparisons. You will first run the supplied fluid example, add a kinetic-energy calculation, and visualize the results. Tutorial 04 then introduces an elastic rubber band coupled to the fluid.
 
 | Lesson | What you will do |
 | --- | --- |
@@ -42,6 +42,7 @@ Start with [lesson 00](tutorial/00-orientation.md) and work through the lessons 
 | [01. Run a fluid simulation](tutorial/01-first-run.md) | Run the fluid example and change viscosity through its input file |
 | [02. Compute kinetic energy](tutorial/02-kinetic-energy.md) | Add a calculation using patch loops, then use the documented `dot` operation |
 | [03. See what the flow is doing](tutorial/03-first-visualization.md) | Open output in VisIt, compare runs, and save figures |
+| [04. Put an elastic rubber band in the fluid](tutorial/04-elastic-loop.md) | Run an elastic rubber band and view it together with the fluid |
 
 These are the currently written lessons. More lessons and their examples will be added as the tutorial develops.
 
@@ -49,6 +50,7 @@ These are the currently written lessons. More lessons and their examples will be
 
 - `tutorial/` contains the lessons and their figures.
 - `examples/navier_stokes/ex1/` contains the starting fluid application, input, and CMake build instructions.
+- `examples/IB/explicit/ex1/` contains the elastic rubber-band application, short input, and point/spring data.
 - `build/` is created when you configure the examples and holds compiled programs and run files. It is ignored by Git.
 
 Lesson 02 walks you through making the source changes yourself. Completed solution applications are not included.
