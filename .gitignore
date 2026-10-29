@@ -1,0 +1,5 @@
+/build/
+/build-*/
+CMakeUserPresets.json
+*.swp
+__pycache__/

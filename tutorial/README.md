@@ -1,0 +1,16 @@
+# Tutorial
+
+Follow the lessons in order. Each lesson explains a software task, guides you through it, and describes what you should have before continuing.
+
+| Lesson | Activity |
+| --- | --- |
+| [00. Find your way around](00-orientation.md) | Set up the repository and identify the source, input, executable, and build directory |
+| [01. Run a fluid simulation](01-first-run.md) | Run the baseline and higher-viscosity cases |
+| [02. Compute kinetic energy](02-kinetic-energy.md) | Add a diagnostic using explicit loops and a hierarchy operation |
+| [03. See what the flow is doing](03-first-visualization.md) | View saved fields in VisIt and export comparison images |
+
+Begin with [lesson 00](00-orientation.md), using a terminal opened at the repository's top level. The lessons define `EXAMPLES_SRC` for this repository, `EXAMPLES_BUILD` for its build directory, and `IBAMR_ROOT` for the installed library. Keep those variables set as you work through the lessons.
+
+The current lessons and numerical output have been checked; a learner walkthrough and review of the graphical VisIt instructions remain pending. Later lessons are still being developed.
+
+Return to the [repository overview](../README.md) for requirements and layout.

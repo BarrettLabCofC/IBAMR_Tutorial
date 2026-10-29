@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 3.15)
+project(LearningIBAMRExamples LANGUAGES C CXX)
+
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+  message(FATAL_ERROR "Use a separate build directory: cmake -S . -B build")
+endif()
+find_package(IBAMR CONFIG REQUIRED)
+if(NOT TARGET IBAMR::IBAMR2d)
+  message(FATAL_ERROR "This tutorial requires a two-dimensional IBAMR installation.")
+endif()
+if(NOT IBAMR_HAVE_SILO)
+  message(FATAL_ERROR "The tutorial requires IBAMR built with Silo for visualization.")
+endif()
+
+add_subdirectory(examples/navier_stokes/ex1)
