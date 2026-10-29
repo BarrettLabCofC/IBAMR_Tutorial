@@ -34,7 +34,7 @@ Replace `$HOME/sfw/ibamr/linux-dbg` with your installation directory, whether in
 
 ## Using the tutorial
 
-Start with [lesson 00](tutorial/00-orientation.md) and work through the lessons in order. Use this repository as your source directory, keep compiled programs and simulation runs under `build/`, and retain separate run directories for comparisons. You will first run the supplied fluid example, add a kinetic-energy calculation, and visualize the results. Tutorial 04 then introduces an elastic rubber band coupled to the fluid.
+Start with [lesson 00](tutorial/00-orientation.md) and work through the lessons in order. Use this repository as your source directory, keep compiled programs and simulation runs under `build/`, and retain separate run directories for comparisons.
 
 | Lesson | What you will do |
 | --- | --- |
@@ -49,10 +49,7 @@ These are the currently written lessons. More lessons and their examples will be
 ## Repository layout
 
 - `tutorial/` contains the lessons and their figures.
-- `examples/navier_stokes/ex1/` contains the starting fluid application, input, and CMake build instructions.
-- `examples/IB/explicit/ex1/` contains the elastic rubber-band application, short input, and point/spring data.
+- `examples/` contains the application source, inputs, structure data, and CMake build instructions used by the tutorials.
 - `build/` is created when you configure the examples and holds compiled programs and run files. It is ignored by Git.
-
-Lesson 02 walks you through making the source changes yourself. Completed solution applications are not included.
 
 The example source and input come from the [IBAMR 0.20.0-pre development version](https://github.com/IBAMR/IBAMR/tree/cb650c845f2a78f0afaf0221b055250ce79da8ea). See [UPSTREAM.json](UPSTREAM.json) for provenance and [COPYRIGHT](COPYRIGHT) for the upstream license. Other IBAMR releases still need compatibility checks. For the external build interface, see the [IBAMR application documentation](https://ibamr.github.io/applications).
