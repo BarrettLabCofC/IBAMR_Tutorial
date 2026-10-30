@@ -8,6 +8,18 @@ Compute kinetic energy by looping over grid levels, patches, and side indices. T
 
 Complete [tutorial 01](01-first-run.md), including the baseline and higher-viscosity runs. Keep `EXAMPLES_SRC` and `EXAMPLES_BUILD` set in your terminal. Source changes go in `examples/navier_stokes/ex1` under the source directory; the new executable and run files go in the corresponding build directory.
 
+## Start with the existing result
+
+Use the completed fluid run from tutorial 01 as the starting example. Before editing its source, check the output in the build directory:
+
+```bash
+cd "$EXAMPLES_BUILD/examples/navier_stokes/ex1/first-flow"
+tail -n 15 INS2d.log
+head -n 4 viz_INS2d/dumps.visit
+```
+
+You already have the simulated velocity field and its saved time sequence. This lesson adds a measurement of that velocity to the program. The energy calculation must be implemented before you can build and run the new executable; the original fluid application remains available throughout.
+
 ## The input and program
 
 Read the supplied [fluid application](../examples/navier_stokes/ex1/example.cpp) as the starting point. In this lesson you will create a source copy and add a complete diagnostic function to it.

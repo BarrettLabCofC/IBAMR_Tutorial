@@ -8,6 +8,60 @@ Build and run a small two-dimensional fluid example, check its progress, and loc
 
 Complete [lesson 00](00-orientation.md). Keep its terminal open so that `EXAMPLES_SRC` and `EXAMPLES_BUILD` remain set. This activity uses `examples/navier_stokes/ex1` in the source and build directories.
 
+## Running the example
+
+First build this example using the example repository’s configured build. You can run this command from any working directory:
+
+```bash
+cmake --build "$EXAMPLES_BUILD" --target navier_stokes-ex1-2d --parallel 4
+```
+
+The target is the name CMake uses for building; the resulting executable is `examples/navier_stokes/ex1/main2d` in the build directory. If the build reports an error, resolve it before continuing.
+
+Create a fresh run subdirectory under the example's build directory and copy in the supplied input. If `first-flow` already exists, choose a new name rather than overwrite an earlier run.
+
+```bash
+cd "$EXAMPLES_BUILD/examples/navier_stokes/ex1"
+mkdir first-flow
+cp "$EXAMPLES_SRC/examples/navier_stokes/ex1/input2d" first-flow/
+cd first-flow
+```
+
+Open this run directory's `input2d` in your editor. Make the following four changes for a short, single-level run. Keep the other settings unchanged.
+
+| Setting | Supplied value | Value for this run |
+| --- | --- | --- |
+| `MAX_LEVELS` | `3` | `1` |
+| `N` | `16` | `64` |
+| `END_TIME` | `2.0` | `1.0` |
+| `Main.viz_dump_interval` | `NFINEST/8` | `10` |
+
+`Main.viz_dump_interval` means the `viz_dump_interval` entry inside the `Main` block. Save the input, then run from the same `first-flow` directory:
+
+```bash
+../main2d input2d
+```
+
+This uses one MPI process. The program reads `input2d` in the current directory and writes its output there. Look for repeated time-step messages. The last completed step should report simulation time `1`; the step number can vary with numerical settings.
+
+## Results
+
+After the run, check the files in this same directory:
+
+```bash
+ls
+tail -n 15 INS2d.log
+head -n 4 viz_INS2d/dumps.visit
+```
+
+`INS2d.log` contains the application log. `viz_INS2d` contains saved fluid fields. `dumps.visit` is a small list telling VisIt where the saved states are; keep the entire visualization directory. Do not open just one numbered state if you want the time sequence. The reference run reached $t=1$, wrote 30 saved states, and produced about 2.8 MB in the run directory.
+
+![Fluid result at time 1](figures/F01-later.png)
+
+*IBAMR output from this input at time `1`, colored by `Omega` with limits `[-80,80]`. Tutorial 03 will show you how to open your output in VisIt and make this view.*
+
+With a completed run to refer to, follow its settings and program setup below.
+
 ## The input and program
 
 ### The starting model
@@ -18,7 +72,7 @@ In the supplied `input2d`, find `L` near the top:
 L = 1.0
 ```
 
-The run settings below will use `N = 64` cells per direction. Find the domain geometry block:
+The run settings above use `N = 64` cells per direction. Find the domain geometry block:
 
 ```text
 CartesianGeometry {
@@ -107,7 +161,7 @@ This separation lets the fluid solver request velocity data without knowing whet
 
 ### Build the grid and advance its data
 
-The solver works over a `PatchHierarchy`: grid cells grouped into rectangular patches and refinement levels. The run settings below use `N = 64` and `MAX_LEVELS = 1` to give a single level with 64 cells per direction. Later, smaller cells can cover selected regions without refining the whole domain. The application's `advanceHierarchy` call advances all the data it manages; you do not write a separate loop over cells in the input file.
+The solver works over a `PatchHierarchy`: grid cells grouped into rectangular patches and refinement levels. The run settings above use `N = 64` and `MAX_LEVELS = 1` to give a single level with 64 cells per direction. Later, smaller cells can cover selected regions without refining the whole domain. The application's `advanceHierarchy` call advances all the data it manages; you do not write a separate loop over cells in the input file.
 
 The geometry and hierarchy are connected explicitly:
 
@@ -170,54 +224,6 @@ The first two calls read the current step and physical time. The application the
 The application's `while` condition checks the end time and `stepsRemaining()`. The numerical work stays inside the integrator, while this outer loop handles progress messages and decides when to save data. For an IB application, an IB hierarchy integrator will occupy this coordinating role and receive both a fluid integrator and a structure strategy.
 
 Trace `END_TIME` through the input's `end_time` entry, then locate `getEndTime()` in the application. This shows where the application reads the integrator's stopping time; `advanceHierarchy(dt)` performs the actual update of the fields.
-
-## Running the example
-
-First build this example using the example repository’s configured build. You can run this command from any working directory:
-
-```bash
-cmake --build "$EXAMPLES_BUILD" --target navier_stokes-ex1-2d --parallel 4
-```
-
-The target is the name CMake uses for building; the resulting executable is `examples/navier_stokes/ex1/main2d` in the build directory. If the build reports an error, resolve it before continuing.
-
-Create a fresh run subdirectory under the example's build directory and copy in the supplied input. If `first-flow` already exists, choose a new name rather than overwrite an earlier run.
-
-```bash
-cd "$EXAMPLES_BUILD/examples/navier_stokes/ex1"
-mkdir first-flow
-cp "$EXAMPLES_SRC/examples/navier_stokes/ex1/input2d" first-flow/
-cd first-flow
-```
-
-Open this run directory's `input2d` in your editor. Make the following four changes for a short, single-level run. Keep the other settings unchanged.
-
-| Setting | Supplied value | Value for this run |
-| --- | --- | --- |
-| `MAX_LEVELS` | `3` | `1` |
-| `N` | `16` | `64` |
-| `END_TIME` | `2.0` | `1.0` |
-| `Main.viz_dump_interval` | `NFINEST/8` | `10` |
-
-`Main.viz_dump_interval` means the `viz_dump_interval` entry inside the `Main` block. Save the input, then run from the same `first-flow` directory:
-
-```bash
-../main2d input2d
-```
-
-This uses one MPI process. The program reads `input2d` in the current directory and writes its output there. Look for repeated time-step messages. The last completed step should report simulation time `1`; the step number can vary with numerical settings.
-
-## Results
-
-After the run, check the files in this same directory:
-
-```bash
-ls
-tail -n 15 INS2d.log
-head -n 4 viz_INS2d/dumps.visit
-```
-
-`INS2d.log` contains the application log. `viz_INS2d` contains saved fluid fields. `dumps.visit` is a small list telling VisIt where the saved states are; keep the entire visualization directory. Do not open just one numbered state if you want the time sequence. The reference run reached $t=1$, wrote 30 saved states, and produced about 2.8 MB in the run directory.
 
 ## Further exploration: compare two viscosities
 

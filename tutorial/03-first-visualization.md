@@ -10,6 +10,60 @@ Finish both runs in [lesson 01](01-first-run.md). Use VisIt with its SAMRAI read
 
 Open `examples/navier_stokes/ex1/first-flow/viz_INS2d/dumps.visit` under `EXAMPLES_BUILD`, the example repository's build directory.
 
+## Opening the saved example
+
+This lesson works with the completed runs from tutorial 01.
+
+### Draw the fluid output
+
+1. Start VisIt. Click **Open** in the main controls, select the baseline `dumps.visit`, and open it.
+2. Under **Plots**, choose **Add → Pseudocolor → Omega**. Click **Draw**. If a grid-level plot was added automatically, hide or delete it for this first view.
+3. Use the time slider to select the first saved state. Check the displayed physical time is `0`.
+4. Double-click the Pseudocolor plot to open its attributes. Enable explicit minimum and maximum limits, set them to `-80` and `80`, choose `hot_desaturated` as the color table, and apply.
+5. Move to the last state. Check the displayed time is `1`, then return to the first state and use the animation controls to play the sequence.
+
+### Look at speed
+
+Speed is the magnitude of velocity, $|\mathbf u|=\sqrt{u_x^2+u_y^2}$. To give it a clear scalar name, open **Controls → Expressions**, create a scalar expression called `speed`, and enter:
+
+```text
+magnitude(<U>)
+```
+
+Apply the expression. Hide the `Omega` plot and add **Pseudocolor → speed**, then **Draw**. Let this speed plot choose its own limits: the signed vorticity range is inappropriate for speed.
+
+Compare the speed and vorticity views at $t=1$. The fastest fluid and the strongest local rotation need not occur in the same places. For flow direction, a vector plot of `U` would add information that speed alone cannot provide.
+
+### Open the comparison run
+
+Return to `Omega`. Open `examples/navier_stokes/ex1/first-flow-viscous/viz_INS2d/dumps.visit` under the build directory, make a Pseudocolor plot of `Omega`, and select its final physical time `1`. Set the same color table and limits `-80` and `80`. Save an image of each run at that time before switching between them.
+
+### Save a figure
+
+With the desired plot and time visible, choose **File → Set save options**, select PNG and the corresponding run directory under the build directory, then use **File → Save window**. Keep the legend and time visible. Name the image so that you can identify the run and time, for example `first-flow-Omega-t1.png`.
+
+The figures shown here were exported at 900 × 900 pixels. Keep the input, log, and visualization files with the saved images in the build directory so the results can be revisited.
+
+If `Omega` is absent, check that you opened the fluid `dumps.visit` from the intended run. If you only see a grid outline, add and draw the Pseudocolor plot.
+
+## Results
+
+![Initial vorticity](figures/F01-initial.png)
+
+*IBAMR result at $t=0$, with vorticity limits $[-80,80]$. Two narrow bands mark the initial shear layers.*
+
+![Later vorticity](figures/F01-later.png)
+
+*The same run at $t=1$, using the same limits. The bands have rolled into rotating regions. This deliberately coarse teaching grid also leaves visible small-scale numerical texture; the picture is not an accuracy assessment.*
+
+![Higher-viscosity result](figures/F01-viscous.png)
+
+*IBAMR result with `MU = 0.001` at $t=1$, with the same vorticity limits. The structures are broader and their peak vorticity is weaker than in the baseline.*
+
+In the reference output, the maximum absolute saved vorticity at $t=1$ was approximately `56.02` for `MU = 0.0001` and `23.78` for `MU = 0.001`. These are VisIt MinMax queries on the saved field, not analytic predictions. Larger viscosity smooths velocity gradients. The numbers support the observation for this grid and short run; they do not establish a converged result.
+
+Before saving the comparison, check that both plots show physical time `1`, variable `Omega`, and color limits `-80` to `80`. These settings let the images show differences between the runs consistently.
+
 ## The input and program
 
 ### Select fields and output settings
@@ -101,61 +155,7 @@ For this two-dimensional example, `Omega` is the out-of-plane vorticity,
 
 $$\omega=\frac{\partial u_y}{\partial x}-\frac{\partial u_x}{\partial y}.$$
 
-The `Omega` plot displays a signed scalar already saved by IBAMR. Use the same color limits when comparing frames or runs. The `speed` expression below instead asks VisIt to compute a scalar from saved `U`; editing that expression changes the view without changing the simulation. The coordinates and fields follow the example's numerical scales, without an assigned dimensional length or time unit.
-
-## Opening the saved example
-
-This lesson works with the completed runs from tutorial 01.
-
-### Draw the fluid output
-
-1. Start VisIt. Click **Open** in the main controls, select the baseline `dumps.visit`, and open it.
-2. Under **Plots**, choose **Add → Pseudocolor → Omega**. Click **Draw**. If a grid-level plot was added automatically, hide or delete it for this first view.
-3. Use the time slider to select the first saved state. Check the displayed physical time is `0`.
-4. Double-click the Pseudocolor plot to open its attributes. Enable explicit minimum and maximum limits, set them to `-80` and `80`, choose `hot_desaturated` as the color table, and apply.
-5. Move to the last state. Check the displayed time is `1`, then return to the first state and use the animation controls to play the sequence.
-
-### Look at speed
-
-Speed is the magnitude of velocity, $|\mathbf u|=\sqrt{u_x^2+u_y^2}$. To give it a clear scalar name, open **Controls → Expressions**, create a scalar expression called `speed`, and enter:
-
-```text
-magnitude(<U>)
-```
-
-Apply the expression. Hide the `Omega` plot and add **Pseudocolor → speed**, then **Draw**. Let this speed plot choose its own limits: the signed vorticity range is inappropriate for speed.
-
-Compare the speed and vorticity views at $t=1$. The fastest fluid and the strongest local rotation need not occur in the same places. For flow direction, a vector plot of `U` would add information that speed alone cannot provide.
-
-### Open the comparison run
-
-Return to `Omega`. Open `examples/navier_stokes/ex1/first-flow-viscous/viz_INS2d/dumps.visit` under the build directory, make a Pseudocolor plot of `Omega`, and select its final physical time `1`. Set the same color table and limits `-80` and `80`. Save an image of each run at that time before switching between them.
-
-### Save a figure
-
-With the desired plot and time visible, choose **File → Set save options**, select PNG and the corresponding run directory under the build directory, then use **File → Save window**. Keep the legend and time visible. Name the image so that you can identify the run and time, for example `first-flow-Omega-t1.png`.
-
-The figures shown here were exported at 900 × 900 pixels. Keep the input, log, and visualization files with the saved images in the build directory so the results can be revisited.
-
-If `Omega` is absent, check that you opened the fluid `dumps.visit` from the intended run. If you only see a grid outline, add and draw the Pseudocolor plot.
-
-## Results
-
-![Initial vorticity](figures/F01-initial.png)
-
-*IBAMR result at $t=0$, with vorticity limits $[-80,80]$. Two narrow bands mark the initial shear layers.*
-
-![Later vorticity](figures/F01-later.png)
-
-*The same run at $t=1$, using the same limits. The bands have rolled into rotating regions. This deliberately coarse teaching grid also leaves visible small-scale numerical texture; the picture is not an accuracy assessment.*
-
-![Higher-viscosity result](figures/F01-viscous.png)
-
-*IBAMR result with `MU = 0.001` at $t=1$, with the same vorticity limits. The structures are broader and their peak vorticity is weaker than in the baseline.*
-
-In the reference output, the maximum absolute saved vorticity at $t=1$ was approximately `56.02` for `MU = 0.0001` and `23.78` for `MU = 0.001`. These are VisIt MinMax queries on the saved field, not analytic predictions. Larger viscosity smooths velocity gradients. The numbers support the observation for this grid and short run; they do not establish a converged result.
-
-Before saving the comparison, check that both plots show physical time `1`, variable `Omega`, and color limits `-80` to `80`. These settings let the images show differences between the runs consistently.
+The `Omega` plot displays a signed scalar already saved by IBAMR. Use the same color limits when comparing frames or runs. The `speed` expression used above instead asks VisIt to compute a scalar from saved `U`; editing that expression changes the view without changing the simulation. The coordinates and fields follow the example's numerical scales, without an assigned dimensional length or time unit.
 
 ## Before moving on
 

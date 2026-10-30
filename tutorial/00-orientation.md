@@ -2,7 +2,73 @@
 
 ## Introduction
 
-Locate the files used by an IBAMR application and follow how the program starts. Then connect its main software components to the familiar fluid and IB equations. This guide assumes a basic familiarity with shell commands and C++ syntax.
+Build the fluid application first, then find your way around its input and source files. This guide assumes basic familiarity with shell commands and C++ syntax.
+
+## Before you start
+
+Start with an installed IBAMR and a copy of this tutorial repository. The application source and inputs are supplied in this repository; you do not need to find IBAMR's own source checkout.
+
+Open a terminal in the example repository's top-level directory and set two names:
+
+```bash
+export EXAMPLES_SRC="$PWD"
+export EXAMPLES_BUILD="$EXAMPLES_SRC/build"
+```
+
+`EXAMPLES_SRC` identifies this repository, and `EXAMPLES_BUILD` identifies its build directory. Application source stays in the repository; compiled programs, run inputs, and output stay under the build directory. Keep quotation marks around paths containing spaces.
+
+## Running the example
+
+Set `IBAMR_ROOT` to your IBAMR installation directory using either of the following methods.
+
+**If you installed with autoibamr**, load its environment script:
+
+```bash
+source "$HOME/autoibamr/configuration/enable.sh"
+```
+
+This sets `IBAMR_ROOT` and loads the environment for that installation. If your autoibamr installation is in a different directory, use its `configuration/enable.sh` instead.
+
+**To set the path manually**, run:
+
+```bash
+export IBAMR_ROOT=$HOME/sfw/ibamr/linux-dbg
+```
+
+Replace `$HOME/sfw/ibamr/linux-dbg` with your installation directory, containing IBAMR's installed headers and libraries. `$HOME` refers to your home directory. This method works for either an autoibamr installation or an IBAMR installation you built manually. Use the compiler and MPI environment matching that installation.
+
+After either method, check the selected path:
+
+```bash
+echo "$IBAMR_ROOT"
+```
+
+Configure the examples:
+
+```bash
+cmake -S "$EXAMPLES_SRC" -B "$EXAMPLES_BUILD" \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_C_COMPILER="$(command -v mpicc)" \
+  -DCMAKE_CXX_COMPILER="$(command -v mpicxx)" \
+  -DCMAKE_PREFIX_PATH="${IBAMR_ROOT:?Set the installed IBAMR prefix first}"
+cmake --build "$EXAMPLES_BUILD" --target navier_stokes-ex1-2d --parallel 4
+```
+
+Use `Debug` for a debug IBAMR installation. CMake locates the installed IBAMR package; the example's `target_link_libraries(... PRIVATE IBAMR::IBAMR2d)` supplies its headers, dependencies, and two-dimensional compile settings. See the [IBAMR application documentation](https://ibamr.github.io/applications) for this external build interface. Resolve configuration or build errors before continuing.
+
+## Results
+
+The result of this lesson is a configured example build and a compiled fluid application. Check the supplied source and input files and the compiled program:
+
+```bash
+ls "$EXAMPLES_SRC/examples/navier_stokes/ex1/example.cpp"
+ls "$EXAMPLES_SRC/examples/navier_stokes/ex1/input2d"
+ls "$EXAMPLES_BUILD/examples/navier_stokes/ex1/main2d"
+```
+
+The first two are supplied source and input files; the third is the program produced by the build. No fluid simulation has been run yet. Tutorial 01 will copy the input into a run directory and use this executable to produce its first results.
+
+## The input and program
 
 ### Fluid, structure, and coupling
 
@@ -34,21 +100,6 @@ $\mathbf x$ is a fluid position, $dV_s$ is a small reference volume, and $\mathb
 *Conceptual diagram. Structure forces act on the fluid grid; fluid velocities move the structure points. The separate drawings show the two descriptions, not two separate physical domains.*
 
 IBAMR separates these jobs. A fluid integrator advances the fluid equations. In the classical IB examples, `IBMethod` manages the structure representation and exchange, a force generator supplies structural forces, and an IB hierarchy integrator coordinates the coupled time advance. Later lessons will follow their actual setup calls. You do not need to write those pieces to run an existing application.
-
-## Before you start
-
-Start with an installed IBAMR and a copy of this tutorial repository. The application source and inputs are supplied in this repository; you do not need to find IBAMR's own source checkout.
-
-Open a terminal in the example repository's top-level directory and set two names:
-
-```bash
-export EXAMPLES_SRC="$PWD"
-export EXAMPLES_BUILD="$EXAMPLES_SRC/build"
-```
-
-`EXAMPLES_SRC` identifies this repository, and `EXAMPLES_BUILD` identifies its build directory. Application source stays in the repository; compiled programs, run inputs, and output stay under the build directory. Keep quotation marks around paths containing spaces.
-
-## The input and program
 
 Read the complete [fluid application](../examples/navier_stokes/ex1/example.cpp) alongside the excerpts below.
 
@@ -109,57 +160,6 @@ MU  = 0.0001
 `MU` sets the fluid viscosity, $\mu$, in the fluid equation above. The application reads this value when a run starts, so you can change viscosity through the input file and run the same executable without recompiling it. In lesson 01, you will use this to run two cases with different viscosities. For now, just locate the setting; that lesson will show how to copy the input into a run directory before editing it.
 
 Changes to the C++ source require rebuilding the executable before you run it again. For example, adding a calculation to `example.cpp` changes what the program does, so editing that file alone is not enough: you must compile the updated source. Changing a value already read from the input file, such as `MU`, does not require this step.
-
-## Running the example
-
-Set `IBAMR_ROOT` to your IBAMR installation directory using either of the following methods.
-
-**If you installed with autoibamr**, load its environment script:
-
-```bash
-source "$HOME/autoibamr/configuration/enable.sh"
-```
-
-This sets `IBAMR_ROOT` and loads the environment for that installation. If your autoibamr installation is in a different directory, use its `configuration/enable.sh` instead.
-
-**To set the path manually**, run:
-
-```bash
-export IBAMR_ROOT=$HOME/sfw/ibamr/linux-dbg
-```
-
-Replace `$HOME/sfw/ibamr/linux-dbg` with your installation directory, containing IBAMR's installed headers and libraries. `$HOME` refers to your home directory. This method works for either an autoibamr installation or an IBAMR installation you built manually. Use the compiler and MPI environment matching that installation.
-
-After either method, check the selected path:
-
-```bash
-echo "$IBAMR_ROOT"
-```
-
-Configure the examples:
-
-```bash
-cmake -S "$EXAMPLES_SRC" -B "$EXAMPLES_BUILD" \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_C_COMPILER="$(command -v mpicc)" \
-  -DCMAKE_CXX_COMPILER="$(command -v mpicxx)" \
-  -DCMAKE_PREFIX_PATH="${IBAMR_ROOT:?Set the installed IBAMR prefix first}"
-cmake --build "$EXAMPLES_BUILD" --target navier_stokes-ex1-2d --parallel 4
-```
-
-Use `Debug` for a debug IBAMR installation. CMake locates the installed IBAMR package; the example's `target_link_libraries(... PRIVATE IBAMR::IBAMR2d)` supplies its headers, dependencies, and two-dimensional compile settings. See the [IBAMR application documentation](https://ibamr.github.io/applications) for this external build interface. Resolve configuration or build errors before continuing.
-
-## Results
-
-The result of this lesson is a configured example build and a compiled fluid application. Check the files introduced above:
-
-```bash
-ls "$EXAMPLES_SRC/examples/navier_stokes/ex1/example.cpp"
-ls "$EXAMPLES_SRC/examples/navier_stokes/ex1/input2d"
-ls "$EXAMPLES_BUILD/examples/navier_stokes/ex1/main2d"
-```
-
-The first two are supplied source and input files; the third is the program produced by the build. No fluid simulation has been run yet. Tutorial 01 will copy the input into a run directory and use this executable to produce its first results.
 
 ## Before moving on
 
