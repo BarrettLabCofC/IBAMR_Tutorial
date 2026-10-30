@@ -6,7 +6,7 @@ Run an elastic rubber band immersed in a fluid, inspect the files that define it
 
 ## Before you start
 
-Complete [tutorial 03](03-first-visualization.md). Keep `EXAMPLES_SRC`, `EXAMPLES_BUILD`, and `IBAMR_ROOT` set in your terminal. This lesson uses `examples/IB/explicit/ex1` in this repository. Its `example.cpp` is the starting application from IBAMR; the supplied input is already shortened for this tutorial.
+Complete [tutorial 03](03-kinetic-energy.md). Keep `EXAMPLES_SRC`, `EXAMPLES_BUILD`, and `IBAMR_ROOT` set in your terminal. This lesson uses `examples/IB/explicit/ex1` in this repository. Its `example.cpp` is the starting application from IBAMR; the supplied input is already shortened for this tutorial.
 
 ## Running the example
 
@@ -55,7 +55,7 @@ There are now two visualization sequences:
 
 ### View the rubber band and fluid together
 
-Use a fresh VisIt window or remove the plots from tutorial 03. Work with the two databases in the `elastic-loop/viz_IB2d` run directory.
+Use a fresh VisIt window or remove the plots from tutorial 02. Work with the two databases in the `elastic-loop/viz_IB2d` run directory.
 
 1. Open `dumps.visit`. Add **Pseudocolor → P** and **Draw**. Set the color table to `hot_desaturated` and explicit limits to `-5` and `5`.
 2. Open `lag_data.visit` as an additional source. Keep the pressure plot from `dumps.visit`, and add **Mesh → curve2d_64_mesh** from `lag_data.visit`. Set the mesh color to black and increase the line width if needed, then **Draw**. The structure should appear inside the fluid plot.
@@ -103,7 +103,7 @@ If the rubber band does not appear, check that the Mesh plot uses `lag_data.visi
 
 Read the [input](../examples/IB/explicit/ex1/input2d) and structure files alongside the application.
 
-The fluid geometry uses the same periodic setup introduced in [tutorial 01](01-first-run.md). The new input pieces are `IBStandardInitializer`, which selects and configures the rubber-band data; `IBMethod`, which configures its coupling to the grid; and `IBHierarchyIntegrator`, which coordinates the coupled time advance. We will follow these as we read the structure files and application setup.
+The fluid geometry uses the same periodic setup introduced in [tutorial 03](03-kinetic-energy.md). The new input pieces are `IBStandardInitializer`, which selects and configures the rubber-band data; `IBMethod`, which configures its coupling to the grid; and `IBHierarchyIntegrator`, which coordinates the coupled time advance. We will follow these as we read the structure files and application setup.
 
 The rubber band is an immersed curve, with fluid on both sides. Its points and spring connections are supplied in separate files.
 
@@ -203,7 +203,7 @@ Open the complete [rubber-band application](../examples/IB/explicit/ex1/example.
 
 ### Add the IB method and coupled integrator
 
-In the fluid-only example, `time_integrator` referred directly to the fluid integrator. Here, `navier_stokes_integrator` retains that fluid role, while `time_integrator` refers to the coupled driver. The patch hierarchy and gridding helpers are constructed as in tutorial 01, with this coupled driver passed to `StandardTagAndInitialize`.
+In the fluid-only example, `time_integrator` referred directly to the fluid integrator. Here, `navier_stokes_integrator` retains that fluid role, while `time_integrator` refers to the coupled driver. The patch hierarchy and gridding helpers are constructed as in tutorial 03, with this coupled driver passed to `StandardTagAndInitialize`.
 
 The application then creates the IB strategy and the integrator that coordinates the coupled simulation:
 
@@ -287,7 +287,7 @@ ib_method_ops->registerLSiloDataWriter(silo_data_writer);
 
 The initializer registers the structure representation with the Silo writer, and the IB method connects that writer to the evolving structure data. The coupled integrator connects the fluid output to the VisIt writer. These registrations happen before hierarchy initialization, so both output systems are ready when the initial state is saved.
 
-After initialization, the application saves an initial state and then writes at the configured intervals and final step, following the pattern in tutorial 03. Each write uses:
+After initialization, the application saves an initial state and then writes at the configured intervals and final step, following the pattern in tutorial 02. Each write uses:
 
 ```cpp
 time_integrator->setupPlotData();
@@ -305,7 +305,7 @@ After registering the model providers and output writers, the application calls:
 time_integrator->initializePatchHierarchy(patch_hierarchy, gridding_algorithm);
 ```
 
-The hierarchy and gridding arguments have the roles introduced in tutorial 01. Calling through the IB integrator now initializes both the fluid fields and the immersed structure. The structure's point positions and spring information are available for the subsequent coupled advance.
+The hierarchy and gridding arguments have the roles introduced in tutorial 03. Calling through the IB integrator now initializes both the fluid fields and the immersed structure. The structure's point positions and spring information are available for the subsequent coupled advance.
 
 The application then releases the temporary initialization objects:
 

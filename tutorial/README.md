@@ -6,8 +6,8 @@ Follow the lessons in order. Each lesson explains a software task, guides you th
 | --- | --- |
 | [00. Find your way around](00-orientation.md) | Set up the repository and identify the source, input, executable, and build directory |
 | [01. Run a fluid simulation](01-first-run.md) | Run the baseline and higher-viscosity cases |
-| [02. Compute kinetic energy](02-kinetic-energy.md) | Add a diagnostic using explicit loops and a hierarchy operation |
-| [03. See what the flow is doing](03-first-visualization.md) | View saved fields in VisIt and export comparison images |
+| [02. See what the flow is doing](02-first-visualization.md) | View saved fields in VisIt and export comparison images |
+| [03. Compute kinetic energy](03-kinetic-energy.md) | Read the fluid application and add a diagnostic using loops and a hierarchy operation |
 | [04. Put an elastic rubber band in the fluid](04-elastic-loop.md) | Run the rubber band, inspect its structure files, and synchronize fluid and structure plots |
 | [05. Change the model through its input](05-input-change.md) | Follow a stiffness override into the force calculation and compare separate runs |
 | [06. Use finer cells near the rubber band](06-refinement.md) | Inspect grid levels, match structure spacing, and compare resolutions |

@@ -133,7 +133,7 @@ Pointer<Database> input_db = app_initializer->getInputDatabase();
 
 `Pointer<...>` is SAMRAI's smart pointer. It tracks references to an object and automatically deletes the object when the last reference is released.
 
-The sequence matters: initialize the libraries first, read the application input next, and then construct the solver and model objects using those settings. Tutorial 01 follows that remaining setup through to the time loop.
+The sequence matters: initialize the libraries first, read the application input next, and then construct the solver and model objects using those settings. Tutorial 03 follows that remaining setup through to the time loop, after you have run and visualized the fluid example.
 
 ### How the executable is built
 

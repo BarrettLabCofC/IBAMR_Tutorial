@@ -1,12 +1,12 @@
-# Lesson 02: Compute kinetic energy
+# Lesson 03: Compute kinetic energy
 
 ## Introduction
 
-Compute kinetic energy by looping over grid levels, patches, and side indices. Then consult the side-operations documentation and use `dot` to perform the same calculation.
+Follow the setup and time loop of the fluid application you have already run and visualized. Then compute kinetic energy by looping over grid levels, patches, and side indices, consult the side-operations documentation, and use `dot` to perform the same calculation.
 
 ## Before you start
 
-Complete [tutorial 01](01-first-run.md), including the baseline and higher-viscosity runs. Keep `EXAMPLES_SRC` and `EXAMPLES_BUILD` set in your terminal. Source changes go in `examples/navier_stokes/ex1` under the source directory; the new executable and run files go in the corresponding build directory.
+Complete [tutorial 02](02-first-visualization.md), using the baseline and higher-viscosity runs from tutorial 01. Keep `EXAMPLES_SRC` and `EXAMPLES_BUILD` set in your terminal. Source changes go in `examples/navier_stokes/ex1` under the source directory; the new executable and run files go in the corresponding build directory.
 
 ## Start with the existing result
 
@@ -19,6 +19,171 @@ head -n 4 viz_INS2d/dumps.visit
 ```
 
 You already have the simulated velocity field and its saved time sequence. This lesson adds a measurement of that velocity to the program. The energy calculation must be implemented before you can build and run the new executable; the original fluid application remains available throughout.
+
+## Follow the existing fluid application
+
+The flow you ran in tutorial 01 and viewed in tutorial 02 now provides a concrete example for reading the program. Follow its model settings, initialization, and time advance before adding the measurement.
+
+### The starting model
+
+In the supplied `input2d`, find `L` near the top:
+
+```text
+L = 1.0
+```
+
+The tutorial 01 run uses `N = 64` cells per direction. Find the domain geometry block:
+
+```text
+CartesianGeometry {
+   domain_boxes = [ (0,0),(N - 1,N - 1) ]
+   x_lo = 0,0
+   x_up = L,L
+   periodic_dimension = 1,1
+}
+```
+
+`x_lo` and `x_up` set the physical bounds. With `L = 1.0`, the domain is the square $0\leq x,y\leq1$. `domain_boxes` gives the grid-index bounds, here `N` cells in each direction. The two entries in `periodic_dimension` enable periodicity in $x$ and $y$: material leaving one side re-enters through the opposite side. These settings give periodic boundaries rather than walls, an inlet, or an outlet.
+
+The horizontal velocity changes direction across thin layers near $y=0.25$ and $y=0.75$. A small vertical disturbance starts their motion away from a perfectly straight arrangement. Find this block in the supplied `input2d`:
+
+```text
+VelocityInitialConditions {
+   rho = 80.0
+   delta = 0.05
+   function_0 = "X1 < 0.5 ? tanh(rho*(X1-0.25)) : tanh(rho*(0.75-X1))"
+   function_1 = "delta*sin(2.0*pi*(X0+0.25))"
+}
+```
+
+`X0` and `X1` mean $x$ and $y$. `function_0` is horizontal velocity and `function_1` is vertical velocity. The expression before `?` selects the first horizontal formula below the middle of the square and the second above it. The local `rho = 80.0` controls layer sharpness; it is distinct from the top-level fluid density `RHO = 1.0`.
+
+Read the complete [fluid application](../examples/navier_stokes/ex1/example.cpp) alongside its [input file](../examples/navier_stokes/ex1/input2d). The excerpts below come from that existing application. Read them in place; they omit surrounding setup and are not standalone programs. This source-reading activity does not require editing or rebuilding anything.
+
+### Follow a viscosity value into the solver
+
+The input selects `SOLVER_TYPE = "STAGGERED"`. The application constructs `INSStaggeredHierarchyIntegrator`, which stores pressure at cell centers and velocity components at cell faces. This layout supports the discrete pressure and incompressibility calculation. The file also contains a collocated-solver block; it is not the selected solver in this run.
+
+Inside the `STAGGERED` branch, find:
+
+```cpp
+time_integrator = new INSStaggeredHierarchyIntegrator(
+    "INSStaggeredHierarchyIntegrator",
+    app_initializer->getComponentDatabase("INSStaggeredHierarchyIntegrator"));
+```
+
+The first argument names this solver object. The second supplies its input database. Inside that input block, `mu = MU` connects the top-level value to the solver's viscosity setting. The application chooses which database to pass into this constructor, so the input-block name must match the string in the lookup. The solver object then reads the entries it understands from that block. The path is therefore `MU` → the block's `mu` entry → the constructed fluid integrator. Top-level names such as `MU` are conveniences chosen by this input file; a solver does not automatically read every top-level setting.
+
+The constructor configures the integrator before the hierarchy exists. It does not yet allocate a velocity field or advance a time step. Those operations happen during initialization and advancement below.
+
+The relevant top-level assignments are:
+
+```text
+RHO = 1.0
+CFL_MAX = 0.3
+DT_MAX = 0.5/NFINEST
+CONVECTIVE_TS_TYPE = "ADAMS_BASHFORTH"
+```
+
+Inside `INSStaggeredHierarchyIntegrator`, find the corresponding entries:
+
+```text
+mu = MU
+rho = RHO
+cfl = CFL_MAX
+dt_max = DT_MAX
+convective_time_stepping_type = CONVECTIVE_TS_TYPE
+```
+
+The selected block receives `mu = MU`, `rho = RHO`, and the time settings. `CFL_MAX = 0.3` limits how far flow moves relative to a cell during a step, while `DT_MAX = 0.5/NFINEST` gives an upper bound on step size. The integrator chooses the actual step, so output every ten steps does not necessarily mean equally spaced physical times. The input selects `ADAMS_BASHFORTH` for the convection term. The viscous term uses the default `TRAPEZOIDAL_RULE` (Crank–Nicolson), since this input does not specify `viscous_time_stepping_type`.
+
+The default is defined in IBAMR’s `INSHierarchyIntegrator.h` (installed under `$IBAMR_ROOT/include/ibamr`):
+
+```cpp
+TimeSteppingType d_viscous_time_stepping_type = TRAPEZOIDAL_RULE;
+```
+
+### Supply the initial field, then initialize it
+
+Find the initial-condition setup:
+
+```cpp
+Pointer<CartGridFunction> u_init = new muParserCartGridFunction(
+    "u_init", app_initializer->getComponentDatabase("VelocityInitialConditions"), grid_geometry);
+time_integrator->registerVelocityInitialConditions(u_init);
+```
+
+The expression object receives the velocity database and domain geometry. The registration call tells the integrator which object will supply initial velocity. The three constructor arguments name the provider, supply its expression database, and supply the physical grid geometry. `function_0` and `function_1` are interpreted as components of the requested velocity field. The provider can evaluate those expressions when the integrator asks it to initialize a patch.
+
+Registration connects a provider to a solver; it does not itself advance time. The later `initializePatchHierarchy` call builds the initial hierarchy and initializes its data using the registered setup.
+
+This separation lets the fluid solver request velocity data without knowing whether the application obtains it from expressions or custom C++. For an initial field that needs more than prescribed expressions, the extension is a custom `IBTK::CartGridFunction`, providing `setDataOnPatch`. `setDataOnPatch` receives the destination data index, variable, patch, requested time, and initialization flag, along with an optional level pointer. Its job is to fill the requested patch data in the variable's layout. The same `registerVelocityInitialConditions` call connects the replacement. We will implement a provider later when adding forces.
+
+### Build the grid and advance its data
+
+The solver works over a `PatchHierarchy`: grid cells grouped into rectangular patches and refinement levels. The tutorial 01 run uses `N = 64` and `MAX_LEVELS = 1` to give a single level with 64 cells per direction. Later, smaller cells can cover selected regions without refining the whole domain. The application's `advanceHierarchy` call advances all the data it manages; you do not write a separate loop over cells in the input file.
+
+The geometry and hierarchy are connected explicitly:
+
+```cpp
+Pointer<CartesianGridGeometry<NDIM>> grid_geometry = new CartesianGridGeometry<NDIM>(
+    "CartesianGeometry", app_initializer->getComponentDatabase("CartesianGeometry"));
+Pointer<PatchHierarchy<NDIM>> patch_hierarchy = new PatchHierarchy<NDIM>("PatchHierarchy", grid_geometry);
+```
+
+The geometry reads physical bounds and periodic directions from its database. The hierarchy receives that geometry and will hold the levels, patches, and numerical data created during initialization. Constructing these objects establishes their relationship; the later initialization call builds the actual grid and fills the initial fields.
+
+Follow the remaining grid helpers through the setup in `example.cpp`:
+
+| Object | What this application asks it to do |
+| --- | --- |
+| `CartesianGridGeometry` | Describe the physical bounds and periodic directions |
+| `PatchHierarchy` | Hold the grid levels, their patches, and associated data |
+| `StandardTagAndInitialize` | Connect initialization/refinement requests to the integrator |
+| `BergerRigoutsos` | Group cells marked for refinement into rectangular boxes |
+| `LoadBalancer` | Distribute patch work among processes |
+| `GriddingAlgorithm` | Assemble the hierarchy using those helpers and the grid input |
+
+`StandardTagAndInitialize` receives `time_integrator`, which lets grid creation ask the solver how to initialize data and identify cells for refinement. The `GriddingAlgorithm` then receives the input block and the three helpers:
+
+```cpp
+Pointer<GriddingAlgorithm<NDIM>> gridding_algorithm =
+    new GriddingAlgorithm<NDIM>("GriddingAlgorithm",
+                                app_initializer->getComponentDatabase("GriddingAlgorithm"),
+                                error_detector,
+                                box_generator,
+                                load_balancer);
+```
+
+The arguments keep separate responsibilities together: `error_detector` connects the solver's requests, `box_generator` forms rectangular patch boxes, and `load_balancer` assigns the work. The application supplies these objects once; grid construction uses them as needed.
+
+The application connects the hierarchy and gridding algorithm with:
+
+```cpp
+time_integrator->initializePatchHierarchy(patch_hierarchy, gridding_algorithm);
+```
+
+At this call the gridding algorithm creates patches and the integrator initializes their data using providers such as `u_init`. This is the point at which the configured model becomes a stored numerical state on a grid.
+
+Our one-level run still uses this infrastructure, but creates no finer levels. `REF_RATIO` only affects finer levels when they exist. The same application setup can therefore support a uniform teaching grid and a later locally refined run.
+
+`periodic_dimension = 1,1` specifies the two periodic directions. The application recognizes this geometry and does not register physical-boundary coefficient objects for these directions. A later cylinder lesson introduces actual inlet/outlet coefficients and their meanings.
+
+Now find these lines inside the time loop:
+
+```cpp
+iteration_num = time_integrator->getIntegratorStep();
+loop_time = time_integrator->getIntegratorTime();
+dt = time_integrator->getMaximumTimeStepSize();
+time_integrator->advanceHierarchy(dt);
+loop_time += dt;
+```
+
+The first two calls read the current step and physical time. The application then asks for an allowed time step and passes it to `advanceHierarchy`. That call performs the integrator's time advance, including its configured numerical operations and solver calls. The local `loop_time` is updated for the application's reporting and output. Adding a number to that local variable alone would not update the fluid state.
+
+The application's `while` condition checks the end time and `stepsRemaining()`. The numerical work stays inside the integrator, while this outer loop handles progress messages and decides when to save data. For an IB application, an IB hierarchy integrator will occupy this coordinating role and receive both a fluid integrator and a structure strategy.
+
+Trace `END_TIME` through the input's `end_time` entry, then locate `getEndTime()` in the application. This shows where the application reads the integrator's stopping time; `advanceHierarchy(dt)` performs the actual update of the fields.
 
 ## The input and program
 
@@ -38,7 +203,7 @@ This is kinetic energy per unit depth. The density comes from the same input ent
 RHO = 1.0
 ```
 
-The first implementation reads the velocity values directly and accumulates their contributions. This activity uses the staggered solver selected in tutorial 01.
+The first implementation reads the velocity values directly and accumulates their contributions. This activity uses the staggered solver described above.
 
 ### Create a version of the example to edit
 
@@ -298,6 +463,6 @@ Each time now has a `KINETIC_ENERGY_MANUAL` line from the loops and a `KINETIC_E
 
 ## Before moving on
 
-This lesson computed kinetic energy by looping over levels, patches, and side indices, then used the documented `dot` operation to perform the same weighted calculation. You should have the modified `kinetic_energy.cpp`, the rebuilt `main2d_energy` executable, a `kinetic_energy_manual.curve` file, and a comparison run's `stdout.log` containing both manual and `dot` results at matching times. Keep these results with their run inputs and visualization output.
+This lesson followed the fluid application from input settings through initialization and time advancement, computed kinetic energy by looping over levels, patches, and side indices, then used the documented `dot` operation to perform the same weighted calculation. You should have the modified `kinetic_energy.cpp`, the rebuilt `main2d_energy` executable, a `kinetic_energy_manual.curve` file, and a comparison run's `stdout.log` containing both manual and `dot` results at matching times. Keep these results with their run inputs and visualization output.
 
-In [tutorial 03](03-first-visualization.md), you will open the fluid output in VisIt, select fields and saved times, and compare the baseline and higher-viscosity runs.
+In [tutorial 04](04-elastic-loop.md), you will add an elastic rubber band to the fluid simulation and view the fluid and structure outputs together at matching times.

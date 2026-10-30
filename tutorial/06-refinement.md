@@ -170,7 +170,7 @@ It gives `0.000125` for this run, half the original bound. This comparison refin
 
 ### Follow the refinement request through the application
 
-Open the supplied [application](../examples/IB/explicit/ex1/example.cpp). The grid helpers were introduced in tutorial 01. Here, focus on the object that connects refinement decisions to the coupled integrator:
+Open the supplied [application](../examples/IB/explicit/ex1/example.cpp). The grid helpers were introduced in tutorial 03. Here, focus on the object that connects refinement decisions to the coupled integrator:
 
 ```cpp
 Pointer<StandardTagAndInitialize<NDIM>> error_detector =
@@ -219,7 +219,7 @@ In this version, that entry sets a threshold on accumulated fluid CFL numbers si
 
 Regridding can change patch boundaries and the data storage attached to those patches. The integrator resets the associated data-transfer operations for the new hierarchy. Neighboring patch data and coarse/fine interpolation supply the extra values needed near patch edges, called ghost cells. These exchanges are handled by the solver here; a later data-processing example will show how to request a ghost fill for a custom calculation.
 
-If you later apply the kinetic-energy calculation from tutorial 02 to a refined fluid hierarchy, retain its hierarchy integration weights. Coarse cells covered by fine cells must not contribute a second copy of the same fluid region.
+If you later apply the kinetic-energy calculation from tutorial 03 to a refined fluid hierarchy, retain its hierarchy integration weights. Coarse cells covered by fine cells must not contribute a second copy of the same fluid region.
 
 ## Before moving on
 

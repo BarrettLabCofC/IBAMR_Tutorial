@@ -40,8 +40,8 @@ Start with [lesson 00](tutorial/00-orientation.md) and work through the lessons 
 | --- | --- |
 | [00. Find your way around](tutorial/00-orientation.md) | Configure and build the example, identify its files, and follow how the application starts |
 | [01. Run a fluid simulation](tutorial/01-first-run.md) | Run the fluid example and change viscosity through its input file |
-| [02. Compute kinetic energy](tutorial/02-kinetic-energy.md) | Add a calculation using patch loops, then use the documented `dot` operation |
-| [03. See what the flow is doing](tutorial/03-first-visualization.md) | Open output in VisIt, compare runs, and save figures |
+| [02. See what the flow is doing](tutorial/02-first-visualization.md) | Open output in VisIt, compare runs, and save figures |
+| [03. Compute kinetic energy](tutorial/03-kinetic-energy.md) | Follow the fluid application, add a calculation using patch loops, then use `dot` |
 | [04. Put an elastic rubber band in the fluid](tutorial/04-elastic-loop.md) | Run an elastic rubber band and view it together with the fluid |
 | [05. Change the model through its input](tutorial/05-input-change.md) | Change rubber-band stiffness through the input and compare results at the same physical time |
 | [06. Use finer cells near the rubber band](tutorial/06-refinement.md) | Add a refined fluid level with matching structure data and compare the results |
