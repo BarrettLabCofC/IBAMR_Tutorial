@@ -44,6 +44,7 @@ Start with [lesson 00](tutorial/00-orientation.md) and work through the lessons 
 | [03. See what the flow is doing](tutorial/03-first-visualization.md) | Open output in VisIt, compare runs, and save figures |
 | [04. Put an elastic rubber band in the fluid](tutorial/04-elastic-loop.md) | Run an elastic rubber band and view it together with the fluid |
 | [05. Change the model through its input](tutorial/05-input-change.md) | Change rubber-band stiffness through the input and compare results at the same physical time |
+| [06. Use finer cells near the rubber band](tutorial/06-refinement.md) | Add a refined fluid level with matching structure data and compare the results |
 
 These are the currently written lessons. More lessons and their examples will be added as the tutorial develops.
 

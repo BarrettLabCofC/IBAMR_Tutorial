@@ -23,6 +23,12 @@
         "Main.viz_dump_interval": "20",
         "Main.data_dump_interval": "0"
       }
+    },
+    "examples/IB/explicit/ex1/curve2d_128.vertex": {
+      "origin": "IBAMR examples/IB/explicit/ex1/curve2d_128.vertex (unchanged; matching structure data for tutorial 06)"
+    },
+    "examples/IB/explicit/ex1/curve2d_128.spring": {
+      "origin": "IBAMR examples/IB/explicit/ex1/curve2d_128.spring (unchanged; matching structure data for tutorial 06)"
     }
   },
   "upstream_version": "0.20.0-pre",

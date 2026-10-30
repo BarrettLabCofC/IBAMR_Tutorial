@@ -10,6 +10,7 @@ Follow the lessons in order. Each lesson explains a software task, guides you th
 | [03. See what the flow is doing](03-first-visualization.md) | View saved fields in VisIt and export comparison images |
 | [04. Put an elastic rubber band in the fluid](04-elastic-loop.md) | Run the rubber band, inspect its structure files, and synchronize fluid and structure plots |
 | [05. Change the model through its input](05-input-change.md) | Follow a stiffness override into the force calculation and compare separate runs |
+| [06. Use finer cells near the rubber band](06-refinement.md) | Inspect grid levels, match structure spacing, and compare resolutions |
 
 Begin with [lesson 00](00-orientation.md), using a terminal opened at the repository's top level. The lessons define `EXAMPLES_SRC` for this repository, `EXAMPLES_BUILD` for its build directory, and `IBAMR_ROOT` for the installed library. Keep those variables set as you work through the lessons.
 

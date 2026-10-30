@@ -172,4 +172,4 @@ This is already the value in the supplied tutorial input. It makes both simulati
 
 This lesson changed spring stiffness through the input, traced the override into the force calculation, and compared separate runs at the same physical time. You should have the original `elastic-loop` run, a new `elastic-loop-stiff` run using the same executable, and comparison images and shape measurements retained with their respective inputs and logs.
 
-Tutorial 06 will use this rubber-band model to introduce finer fluid cells and matching structure-point spacing. You will inspect the grid and compare a measurement while keeping the physical model fixed.
+[Tutorial 06](06-refinement.md) will use this rubber-band model to introduce finer fluid cells and matching structure-point spacing. You will inspect the grid and compare a measurement while keeping the physical model fixed.
