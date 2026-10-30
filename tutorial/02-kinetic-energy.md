@@ -1,12 +1,18 @@
 # Lesson 02: Compute kinetic energy
 
+## Introduction
+
 Compute kinetic energy by looping over grid levels, patches, and side indices. Then consult the side-operations documentation and use `dot` to perform the same calculation.
 
 ## Before you start
 
 Complete [tutorial 01](01-first-run.md), including the baseline and higher-viscosity runs. Keep `EXAMPLES_SRC` and `EXAMPLES_BUILD` set in your terminal. Source changes go in `examples/navier_stokes/ex1` under the source directory; the new executable and run files go in the corresponding build directory.
 
-## The quantity to compute
+## The input and program
+
+Read the supplied [fluid application](../examples/navier_stokes/ex1/example.cpp) as the starting point. In this lesson you will create a source copy and add a complete diagnostic function to it.
+
+### The quantity to compute
 
 For the constant-density, two-dimensional case, compute
 
@@ -21,8 +27,6 @@ RHO = 1.0
 ```
 
 The first implementation reads the velocity values directly and accumulates their contributions. This activity uses the staggered solver selected in tutorial 01.
-
-## Compute energy by looping over patches
 
 ### Create a version of the example to edit
 
@@ -53,6 +57,8 @@ double compute_kinetic_energy_manual(Pointer<PatchHierarchy<NDIM>> patch_hierarc
                                      Pointer<INSHierarchyIntegrator> ins_integrator,
                                      double rho);
 ```
+
+The function receives the hierarchy containing the grid, the fluid integrator identifying its velocity state, and the constant density. It returns one number, the total kinetic energy; it does not modify the velocity. Passing the integrator lets the function find its data through the public interface rather than assume a fixed data index.
 
 ### Retrieve the patch data and accumulate energy
 
@@ -95,9 +101,11 @@ compute_kinetic_energy_manual(Pointer<PatchHierarchy<NDIM>> patch_hierarchy,
 }
 ```
 
-IBAMR uses a `Variable` to identify a quantity, such as velocity, and a `VariableContext` to identify which stored version of that quantity to use. Here, `getVelocityVariable()` and `getCurrentContext()` select the current velocity. `VariableDatabase` maps this pair to `u_idx`, which each patch uses to locate its velocity data.
+IBAMR uses a `Variable` to identify a quantity, such as velocity, and a `VariableContext` to identify which stored version of that quantity to use. Here, `getVelocityVariable()` retrieves the variable for the fluid velocity and `getCurrentContext()` select the current data. `VariableDatabase` maps this pair to `u_idx`, which is a patch data index that each patch uses to locate its velocity data. 
 
 The next lookup obtains `wgt_idx`, the data index for the side-centered integration weights maintained by `HierarchyMathOps`. These weights include the integration volumes and account for shared patch boundaries and coarse/fine coverage.
+
+Coarse cells covered by finer cells have zero integration weight, so the sum counts the represented fluid volume once. This remains important when the same function is used on a refined hierarchy, even though the present example has one level.
 
 The outer loop selects each level with `getPatchLevel(ln)`. `PatchLevel::Iterator` then visits the patches owned by this MPI process. On each patch, `getPatchData(u_idx)` retrieves the velocity arrays, and `getPatchData(wgt_idx)` retrieves the weights. `SideData<NDIM, double>` identifies their storage layout and numerical type.
 
@@ -140,7 +148,7 @@ pout << "KINETIC_ENERGY_MANUAL " << loop_time << " " << manual_energy << "\n";
 
 The preceding `advanceHierarchy(dt)` call has completed the step, so the current context holds updated velocity. Each output line contains a label, physical time, and global energy. SAMRAI's `pout` prints on the primary process while the calculation runs on all processes.
 
-### Build and run the manual version
+## Running the example
 
 Append this block to `examples/navier_stokes/ex1/CMakeLists.txt` in the source directory:
 
@@ -150,7 +158,7 @@ target_link_libraries(navier_stokes-ex1-energy-2d PRIVATE IBAMR::IBAMR2d)
 set_target_properties(navier_stokes-ex1-energy-2d PROPERTIES OUTPUT_NAME main2d_energy)
 ```
 
-This adds a build target for `kinetic_energy.cpp` and names its executable `main2d_energy`. Regenerate the example repository’s build configuration to register the new target, then compile it:
+`add_executable` creates a separate target from the source copy, so the original fluid application remains available. `target_link_libraries` supplies the same installed 2D IBAMR interface as before. `OUTPUT_NAME` names the new executable `main2d_energy`; use the target name for building and the output name for running. Regenerate the example repository’s build configuration to register the new target, then compile it:
 
 ```bash
 cmake -S "$EXAMPLES_SRC" -B "$EXAMPLES_BUILD"
@@ -167,6 +175,8 @@ cd first-flow-energy
 ../main2d_energy input2d > stdout.log 2>&1
 tail -n 10 stdout.log
 ```
+
+## Results
 
 The redirection saves the program's messages in `stdout.log`. Extract the energy lines into a two-column file containing time and energy:
 
@@ -187,7 +197,11 @@ The checked runs give these reference values:
 
 Both runs start with the same velocity and density, so their initial energies match. These values provide a check on the function and the selected input; they are results for this grid and run, rather than a numerical-accuracy benchmark.
 
-## Look at the side-operations documentation
+## Further exploration: use a hierarchy operation
+
+Continue with the same source file to compare your manual calculation with the library operation.
+
+### Look at the side-operations documentation
 
 The [IBAMR API documentation](https://ibamr.github.io/IBAMR-docs/ibamr/) describes class methods, their arguments, and default values. For this calculation, open the [`HierarchyDataOpsReal` class reference](https://ibamr.github.io/IBAMR-docs/ibamr/classSAMRAI_1_1math_1_1HierarchyDataOpsReal.html). It defines the common operations that `HierarchySideDataOpsReal` implements for side-centered data, including methods for computing useful measurements. In particular, read the [`dot` method description](https://ibamr.github.io/IBAMR-docs/ibamr/classSAMRAI_1_1math_1_1HierarchyDataOpsReal.html#a3c304a331cc9e8ad1894850e1c948ba0). We can use this method as an alternative to looping over patches manually. Match the documented arguments to the values we already have:
 
@@ -200,7 +214,7 @@ The [IBAMR API documentation](https://ibamr.github.io/IBAMR-docs/ibamr/) describ
 
 Use these method descriptions to check which data indices an operation expects and whether it already performs the parallel reduction.
 
-## Use dot to compute the same energy
+### Use dot to compute the same energy
 
 Add the side-operations header before `app_namespaces.h`:
 
@@ -238,9 +252,9 @@ compute_kinetic_energy(Pointer<PatchHierarchy<NDIM>> patch_hierarchy,
 
 The velocity and weight lookups identify the same data used in the manual function. `side_ops` is configured to operate from level `0` through the current finest level. `dot(u_idx, u_idx, wgt_idx)` multiplies velocity by itself, applies the weights, and sums across components, patches, and levels. Multiplying by `rho/2` gives the energy.
 
-`dot` also performs the MPI reduction because `local_only` defaults to `false`. Its result is already global; do not apply another `sumReduction`. Every process still calls the function. The manual version shows the individual data-access and accumulation steps that this hierarchy operation handles.
+`dot` also performs the MPI reduction because `local_only` defaults to `false`. Its result is already global; do not apply another `sumReduction`. The manual version shows the individual data-access and accumulation steps that this hierarchy operation handles.
 
-### Compare the two implementations
+#### Compare the two implementations
 
 Immediately after the initial manual-energy output line, add:
 
