@@ -106,7 +106,7 @@ IBStandardInitializer {
 
 `structure_names` selects the shared basename of the vertex and spring files. The nested `curve2d_64` block configures that structure, with zero-based `level_number = 0` in this one-level case. `uniform_spring_stiffness = K/ds` overrides the stiffness column for every spring in this structure. Here `ds` is the reference spacing used to scale the spring coefficient; the resulting stiffness is approximately `193.5324`, matching the supplied file for `K = 1`. It is a structural coefficient, separate from fluid viscosity `MU`.
 
-The calculations involving `alpha` and `beta` determine the reference spacing and stiffness override in this input. The initializer still reads the point coordinates from `.vertex`: editing `alpha` or `beta` here does not regenerate the ellipse. Leave the geometry and coefficients unchanged in this lesson. Tutorial 05 will use this input mechanism to make a controlled model change.
+The calculations involving `alpha` and `beta` determine the reference spacing and stiffness override in this input. The initializer still reads the point coordinates from `.vertex`: editing `alpha` or `beta` here does not regenerate the ellipse. Leave the geometry and coefficients unchanged in this lesson. [Tutorial 05](05-input-change.md) will use this input mechanism to make a controlled model change.
 
 Open the complete [rubber-band application](../examples/IB/explicit/ex1/example.cpp) in the source directory. The following excerpts are parts of that application to read in place; you do not need to add or change code for this lesson.
 
@@ -331,4 +331,4 @@ If the rubber band does not appear, check that the Mesh plot uses `lag_data.visi
 
 This lesson ran a coupled IB simulation, read the point and spring files, and followed how the initializer, force generator, IB method, and fluid solver are connected. You should have a built rubber-band executable, a complete `elastic-loop` run with both visualization sequences, saved initial and later images with the fluid and structure matched in time, and width, height, and aspect-ratio measurements for both states.
 
-Tutorial 05 will change a model parameter through the rubber band's input file and compare a second run with this baseline. You will follow the active input coefficient and keep the outputs separate for a comparison at the same physical time.
+[Tutorial 05](05-input-change.md) will change a model parameter through the rubber band's input file and compare a second run with this baseline. You will follow the active input coefficient and keep the outputs separate for a comparison at the same physical time.

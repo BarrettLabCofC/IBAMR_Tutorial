@@ -43,6 +43,7 @@ Start with [lesson 00](tutorial/00-orientation.md) and work through the lessons 
 | [02. Compute kinetic energy](tutorial/02-kinetic-energy.md) | Add a calculation using patch loops, then use the documented `dot` operation |
 | [03. See what the flow is doing](tutorial/03-first-visualization.md) | Open output in VisIt, compare runs, and save figures |
 | [04. Put an elastic rubber band in the fluid](tutorial/04-elastic-loop.md) | Run an elastic rubber band and view it together with the fluid |
+| [05. Change the model through its input](tutorial/05-input-change.md) | Change rubber-band stiffness through the input and compare results at the same physical time |
 
 These are the currently written lessons. More lessons and their examples will be added as the tutorial develops.
 
