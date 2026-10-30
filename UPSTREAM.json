@@ -31,6 +31,6 @@
       "origin": "IBAMR examples/IB/explicit/ex1/curve2d_128.spring (unchanged; matching structure data for tutorial 06)"
     }
   },
-  "upstream_version": "0.20.0-pre",
-  "source_url": "https://github.com/IBAMR/IBAMR/tree/cb650c845f2a78f0afaf0221b055250ce79da8ea"
+  "upstream_version": "0.19.0",
+  "source_url": "https://github.com/IBAMR/IBAMR/tree/v0.19.0"
 }

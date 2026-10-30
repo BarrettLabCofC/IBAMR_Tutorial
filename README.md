@@ -6,7 +6,7 @@ A guided introduction to building, running, and modifying IBAMR applications. Th
 
 This tutorial assumes basic familiarity with using the terminal and C++ syntax. Before starting, have the following installed:
 
-- **IBAMR**, installed either with autoibamr or manually, with 2D and Silo support for the current lessons.
+- **IBAMR v0.19.0**, installed either with autoibamr or manually, with 2D and Silo support for the current lessons.
 - **VisIt**, for opening simulation output and saving figures.
 - **Git**, to clone this repository locally.
 - **CMake 3.15 or newer** and the compiler/MPI environment matching your IBAMR installation.
@@ -54,4 +54,6 @@ These are the currently written lessons. More lessons and their examples will be
 - `examples/` contains the application source, inputs, structure data, and CMake build instructions used by the tutorials.
 - `build/` is created when you configure the examples and holds compiled programs and run files. It is ignored by Git.
 
-The example source and input come from the [IBAMR 0.20.0-pre development version](https://github.com/IBAMR/IBAMR/tree/cb650c845f2a78f0afaf0221b055250ce79da8ea). See [UPSTREAM.json](UPSTREAM.json) for provenance and [COPYRIGHT](COPYRIGHT) for the upstream license. Other IBAMR releases still need compatibility checks. For the external build interface, see the [IBAMR application documentation](https://ibamr.github.io/applications).
+The example source and input come from [IBAMR v0.19.0](https://github.com/IBAMR/IBAMR/tree/v0.19.0). CMake requires that version of the installed library. See [UPSTREAM.json](UPSTREAM.json) for provenance and [COPYRIGHT](COPYRIGHT) for the upstream license. Other IBAMR releases still need compatibility checks. For the external build interface, see the [IBAMR application documentation](https://ibamr.github.io/applications).
+
+The v0.19.0 source update is complete; compilation and simulation checks for this version are pending. Existing figures and reference measurements were generated with IBAMR 0.20.0-pre and retain that provenance.

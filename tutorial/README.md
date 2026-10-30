@@ -14,6 +14,6 @@ Follow the lessons in order. Each lesson explains a software task, guides you th
 
 Begin with [lesson 00](00-orientation.md), using a terminal opened at the repository's top level. The lessons define `EXAMPLES_SRC` for this repository, `EXAMPLES_BUILD` for its build directory, and `IBAMR_ROOT` for the installed library. Keep those variables set as you work through the lessons.
 
-The current lessons and numerical output have been checked; a learner walkthrough and review of the graphical VisIt instructions remain pending. Later lessons are still being developed.
+The examples target IBAMR v0.19.0.
 
 Return to the [repository overview](../README.md) for requirements and layout.
