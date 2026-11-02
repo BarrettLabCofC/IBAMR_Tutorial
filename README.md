@@ -45,8 +45,13 @@ Start with [tutorial 00](tutorial/00-orientation.md) and work through the tutori
 | [04. Put an elastic rubber band in the fluid](tutorial/04-elastic-loop.md) | Run an elastic rubber band and view it together with the fluid |
 | [05. Change the model through its input](tutorial/05-input-change.md) | Change rubber-band stiffness through the input and compare results at the same physical time |
 | [06. Use finer cells near the rubber band](tutorial/06-refinement.md) | Add a refined fluid level with matching structure data and compare the results |
+| 07. Run a finite-element elastic ring (planned) | Run and visualize an elastic structure represented by finite elements |
+| 08. Modify the finite-element model (planned) | Change the initial stretch and compare geometry and motion |
+| 09. Hold a cylinder in a flow (planned) | Use target forces, follow physical boundary conditions, and change an inlet expression |
+| 10. Create a named application (planned) | Organize a personal rubber-band application and its build target |
+| 11. Implement a custom spring law (planned) | Add and compare a small C++ model change |
 
-These are the currently written tutorials. More tutorials and their examples will be added as the tutorial develops.
+Linked tutorials are available now; entries marked planned show the upcoming sequence. More tutorials and their examples will be added as the tutorial develops.
 
 ## Repository layout
 

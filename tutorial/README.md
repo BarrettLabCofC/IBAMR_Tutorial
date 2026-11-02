@@ -11,6 +11,13 @@ Follow the tutorials in order. Each tutorial explains a software task, guides yo
 | [04. Put an elastic rubber band in the fluid](04-elastic-loop.md) | Run the rubber band, inspect its structure files, and synchronize fluid and structure plots |
 | [05. Change the model through its input](05-input-change.md) | Follow a stiffness override into the force calculation and compare separate runs |
 | [06. Use finer cells near the rubber band](06-refinement.md) | Inspect grid levels, match structure spacing, and compare resolutions |
+| 07. Run a finite-element elastic ring (planned) | Run and visualize an elastic structure represented by finite elements |
+| 08. Modify the finite-element model (planned) | Change the initial stretch and compare geometry and motion |
+| 09. Hold a cylinder in a flow (planned) | Use target forces, follow physical boundary conditions, and change an inlet expression |
+| 10. Create a named application (planned) | Organize a personal rubber-band application and its build target |
+| 11. Implement a custom spring law (planned) | Add and compare a small C++ model change |
+
+Entries marked planned are not yet available.
 
 Begin with [tutorial 00](00-orientation.md), using a terminal opened at the repository's top level. The tutorials define `EXAMPLES_SRC` for this repository, `EXAMPLES_BUILD` for its build directory, and `IBAMR_ROOT` for the installed library. Keep those variables set as you work through the tutorials.
 

@@ -225,4 +225,4 @@ If you later apply the kinetic-energy calculation from tutorial 03 to a refined 
 
 This tutorial added a finer grid level, supplied matching structure files, inspected the level outlines, and traced how structure-based tagging places finer patches. You should have separate baseline and refined runs, pressure/structure images at matching times, a grid-level image, and shape measurements retained with the input and logs.
 
-Tutorial 07 will introduce target forces that hold an object near prescribed positions. It will also explain the inlet, outlet, and other physical boundary settings in that example.
+Tutorial 07 will introduce a finite-element elastic ring. You will run it and view its element mesh alongside the fluid before changing its initial stretch in tutorial 08.
