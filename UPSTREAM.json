@@ -5,7 +5,7 @@
       "origin": "IBAMR examples/navier_stokes/ex1/example.cpp (unchanged)"
     },
     "examples/navier_stokes/ex1/input2d": {
-      "origin": "IBAMR examples/navier_stokes/ex1/input2d (unchanged; lesson 01 supplies run edits)"
+      "origin": "IBAMR examples/navier_stokes/ex1/input2d (unchanged; tutorial 01 supplies run edits)"
     },
     "examples/IB/explicit/ex1/example.cpp": {
       "origin": "IBAMR examples/IB/explicit/ex1/example.cpp (unchanged)"
@@ -29,6 +29,24 @@
     },
     "examples/IB/explicit/ex1/curve2d_128.spring": {
       "origin": "IBAMR examples/IB/explicit/ex1/curve2d_128.spring (unchanged; matching structure data for tutorial 06)"
+    },
+    "examples/IB/explicit/ex2/example.cpp": {
+      "origin": "IBAMR examples/IB/explicit/ex2/example.cpp (unchanged)"
+    },
+    "examples/IB/explicit/ex2/cylinder2d_128.vertex": {
+      "origin": "IBAMR examples/IB/explicit/ex2/cylinder2d_128.vertex (unchanged)"
+    },
+    "examples/IB/explicit/ex2/cylinder2d_128.spring": {
+      "origin": "IBAMR examples/IB/explicit/ex2/cylinder2d_128.spring (unchanged)"
+    },
+    "examples/IB/explicit/ex2/input2d.cylinder": {
+      "origin": "IBAMR examples/IB/explicit/ex2/input2d.cylinder",
+      "changes": {
+        "MAX_LEVELS": "4",
+        "END_TIME": "1.0",
+        "Main.viz_dump_interval": "10",
+        "IBStandardInitializer.structure_names and nested database": "cylinder2d_128"
+      }
     }
   },
   "upstream_version": "0.19.0",

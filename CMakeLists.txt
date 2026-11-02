@@ -14,3 +14,4 @@ endif()
 
 add_subdirectory(examples/navier_stokes/ex1)
 add_subdirectory(examples/IB/explicit/ex1)
+add_subdirectory(examples/IB/explicit/ex2)
