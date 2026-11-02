@@ -1,4 +1,4 @@
-# Lesson 00: Find your way around
+# Tutorial 00: Find your way around
 
 ## Introduction
 
@@ -58,7 +58,7 @@ Use `Debug` for a debug IBAMR installation. CMake locates the installed IBAMR pa
 
 ## Results
 
-The result of this lesson is a configured example build and a compiled fluid application. Check the supplied source and input files and the compiled program:
+The result of this tutorial is a configured example build and a compiled fluid application. Check the supplied source and input files and the compiled program:
 
 ```bash
 ls "$EXAMPLES_SRC/examples/navier_stokes/ex1/example.cpp"
@@ -99,7 +99,7 @@ $\mathbf x$ is a fluid position, $dV_s$ is a small reference volume, and $\mathb
 
 *Conceptual diagram. Structure forces act on the fluid grid; fluid velocities move the structure points. The separate drawings show the two descriptions, not two separate physical domains.*
 
-IBAMR separates these jobs. A fluid integrator advances the fluid equations. In the classical IB examples, `IBMethod` manages the structure representation and exchange, a force generator supplies structural forces, and an IB hierarchy integrator coordinates the coupled time advance. Later lessons will follow their actual setup calls. You do not need to write those pieces to run an existing application.
+IBAMR separates these jobs. A fluid integrator advances the fluid equations. In the classical IB examples, `IBMethod` manages the structure representation and exchange, a force generator supplies structural forces, and an IB hierarchy integrator coordinates the coupled time advance. Later tutorials will follow their actual setup calls. You do not need to write those pieces to run an existing application.
 
 Read the complete [fluid application](../examples/navier_stokes/ex1/example.cpp) alongside the excerpts below.
 
@@ -112,7 +112,7 @@ Read the complete [fluid application](../examples/navier_stokes/ex1/example.cpp)
 | Input, here `input2d` | Supplies values and expressions read when the program starts | To change an exposed model or run setting; no C++ rebuild needed |
 | Run directory under the build directory | Holds one run's input, log, and results | Use a separate subdirectory for each comparison |
 
-The example's `CMakeLists.txt` describes how to build it. The source and build directories are different places, even though their example subfolders look similar. In the next lesson, copy the supplied input into a run subdirectory under the build directory and edit that copy.
+The example's `CMakeLists.txt` describes how to build it. The source and build directories are different places, even though their example subfolders look similar. In the next tutorial, copy the supplied input into a run subdirectory under the build directory and edit that copy.
 
 ### How the program starts
 
@@ -157,12 +157,12 @@ To see how an input file controls a simulation setting, open `examples/navier_st
 MU  = 0.0001
 ```
 
-`MU` sets the fluid viscosity, $\mu$, in the fluid equation above. The application reads this value when a run starts, so you can change viscosity through the input file and run the same executable without recompiling it. In lesson 01, you will use this to run two cases with different viscosities. For now, just locate the setting; that lesson will show how to copy the input into a run directory before editing it.
+`MU` sets the fluid viscosity, $\mu$, in the fluid equation above. The application reads this value when a run starts, so you can change viscosity through the input file and run the same executable without recompiling it. In tutorial 01, you will use this to run two cases with different viscosities. For now, just locate the setting; that tutorial will show how to copy the input into a run directory before editing it.
 
 Changes to the C++ source require rebuilding the executable before you run it again. For example, adding a calculation to `example.cpp` changes what the program does, so editing that file alone is not enough: you must compile the updated source. Changing a value already read from the input file, such as `MU`, does not require this step.
 
 ## Before moving on
 
-This lesson introduced the application source, build directory, executable, and input file, and explained which changes require rebuilding. You should have the example repository configured, the fluid executable `main2d` built, and `EXAMPLES_SRC`, `EXAMPLES_BUILD`, and `IBAMR_ROOT` set in your terminal.
+This tutorial introduced the application source, build directory, executable, and input file, and explained which changes require rebuilding. You should have the example repository configured, the fluid executable `main2d` built, and `EXAMPLES_SRC`, `EXAMPLES_BUILD`, and `IBAMR_ROOT` set in your terminal.
 
-Continue to [lesson 01](01-first-run.md) to run the fluid example using the source, build, and input files introduced here.
+Continue to [tutorial 01](01-first-run.md) to run the fluid example using the source, build, and input files introduced here.

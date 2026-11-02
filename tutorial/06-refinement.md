@@ -1,4 +1,4 @@
-# Lesson 06: Use finer cells near the rubber band
+# Tutorial 06: Use finer cells near the rubber band
 
 ## Introduction
 
@@ -6,7 +6,7 @@ Run the rubber band with a finer fluid grid near its moving points. View the gri
 
 ## Before you start
 
-Complete [tutorial 05](05-input-change.md). Use the original `elastic-loop` run from tutorial 04 as this lesson's baseline, with `K = 1.0`, rather than the stiffer case. Keep `EXAMPLES_SRC` and `EXAMPLES_BUILD` set. This lesson uses the same application and executable; no rebuild is needed.
+Complete [tutorial 05](05-input-change.md). Use the original `elastic-loop` run from tutorial 04 as this tutorial's baseline, with `K = 1.0`, rather than the stiffer case. Keep `EXAMPLES_SRC` and `EXAMPLES_BUILD` set. This tutorial uses the same application and executable; no rebuild is needed.
 
 ## Running the example
 
@@ -223,6 +223,6 @@ If you later apply the kinetic-energy calculation from tutorial 03 to a refined 
 
 ## Before moving on
 
-This lesson added a finer grid level, supplied matching structure files, inspected the level outlines, and traced how structure-based tagging places finer patches. You should have separate baseline and refined runs, pressure/structure images at matching times, a grid-level image, and shape measurements retained with the input and logs.
+This tutorial added a finer grid level, supplied matching structure files, inspected the level outlines, and traced how structure-based tagging places finer patches. You should have separate baseline and refined runs, pressure/structure images at matching times, a grid-level image, and shape measurements retained with the input and logs.
 
 Tutorial 07 will introduce target forces that hold an object near prescribed positions. It will also explain the inlet, outlet, and other physical boundary settings in that example.

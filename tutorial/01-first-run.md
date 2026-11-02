@@ -1,4 +1,4 @@
-# Lesson 01: Run a fluid simulation
+# Tutorial 01: Run a fluid simulation
 
 ## Introduction
 
@@ -6,7 +6,7 @@ Build and run a small two-dimensional fluid example, check its progress, and loc
 
 ## Before you start
 
-Complete [lesson 00](00-orientation.md). Keep its terminal open so that `EXAMPLES_SRC` and `EXAMPLES_BUILD` remain set. This activity uses `examples/navier_stokes/ex1` in the source and build directories.
+Complete [tutorial 00](00-orientation.md). Keep its terminal open so that `EXAMPLES_SRC` and `EXAMPLES_BUILD` remain set. This activity uses `examples/navier_stokes/ex1` in the source and build directories.
 
 ## Running the example
 
@@ -87,12 +87,12 @@ cd "$EXAMPLES_BUILD/examples/navier_stokes/ex1/first-flow-viscous"
 ../main2d input2d
 ```
 
-The comparison should also reach $t=1$. In [lesson 02](02-first-visualization.md), compare the two flows at that same physical time.
+The comparison should also reach $t=1$. In [tutorial 02](02-first-visualization.md), compare the two flows at that same physical time.
 
 If the program says it cannot open `input2d`, check `pwd` and `ls`: run from the directory containing the copied input. If the visualization directory is missing, inspect the log before moving on.
 
 ## Before moving on
 
-This lesson built and ran the fluid example, prepared its run inputs, and changed viscosity without recompiling. You should have separate `first-flow` and `first-flow-viscous` run directories, each containing its input, `INS2d.log`, and complete `viz_INS2d` output directory with a `dumps.visit` file.
+This tutorial built and ran the fluid example, prepared its run inputs, and changed viscosity without recompiling. You should have separate `first-flow` and `first-flow-viscous` run directories, each containing its input, `INS2d.log`, and complete `viz_INS2d` output directory with a `dumps.visit` file.
 
 In [tutorial 02](02-first-visualization.md), you will open the fluid output in VisIt, select fields and saved times, and compare the baseline and higher-viscosity runs.

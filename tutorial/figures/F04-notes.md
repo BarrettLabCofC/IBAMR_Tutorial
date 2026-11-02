@@ -1,6 +1,6 @@
 # Rubber-band refinement figures
 
-Created 2026-10-30 from actual IBAMR 0.20.0-pre output, rendered with VisIt 3.4.2. The figures compare a one-level baseline with a two-level locally refined run and show where the fine patches lie.
+Created 2026-10-30 from actual IBAMR v0.19.0 output, rendered with VisIt 3.4.2. The figures compare a one-level baseline with a two-level locally refined run and show where the fine patches lie.
 
 - Application: `examples/IB/explicit/ex1/example.cpp`, unchanged. Baseline uses the supplied tutorial `input2d` and `curve2d_64` files.
 - Refined input: `MAX_LEVELS = 2`, `REF_RATIO = 2`, and both initializer structure names changed to `curve2d_128`. The matching vertex and spring files are unchanged upstream data. Provenance is in `../../UPSTREAM.json`.
@@ -12,3 +12,5 @@ Created 2026-10-30 from actual IBAMR 0.20.0-pre output, rendered with VisIt 3.4.
 - Final width/height ratios: baseline `1.4335747840`; refined `1.4020259745`. This is a two-resolution comparison, not a convergence result.
 
 The three images were visually inspected. Complete run inputs/logs and capture metadata are retained with the author validation records. The figure source is IBAMR simulation data, not an illustrative reconstruction.
+
+Regenerated from fresh v0.19.0 opt-build runs on 2026-10-30. Saved times, scalar ranges, and structure extents were queried before visual inspection.

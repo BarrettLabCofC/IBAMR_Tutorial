@@ -1,4 +1,4 @@
-# Lesson 04: Put an elastic rubber band in the fluid
+# Tutorial 04: Put an elastic rubber band in the fluid
 
 ## Introduction
 
@@ -6,7 +6,7 @@ Run an elastic rubber band immersed in a fluid, inspect the files that define it
 
 ## Before you start
 
-Complete [tutorial 03](03-kinetic-energy.md). Keep `EXAMPLES_SRC`, `EXAMPLES_BUILD`, and `IBAMR_ROOT` set in your terminal. This lesson uses `examples/IB/explicit/ex1` in this repository. Its `example.cpp` is the starting application from IBAMR; the supplied input is already shortened for this tutorial.
+Complete [tutorial 03](03-kinetic-energy.md). Keep `EXAMPLES_SRC`, `EXAMPLES_BUILD`, and `IBAMR_ROOT` set in your terminal. This tutorial uses `examples/IB/explicit/ex1` in this repository. Its `example.cpp` is the starting application from IBAMR; the supplied input is already shortened for this tutorial.
 
 ## Running the example
 
@@ -197,9 +197,9 @@ IBStandardInitializer {
 
 `structure_names` selects the shared basename of the vertex and spring files. The nested `curve2d_64` block configures that structure, with zero-based `level_number = 0` in this one-level case. `uniform_spring_stiffness = K/ds` overrides the stiffness column for every spring in this structure. Here `ds` is the reference spacing used to scale the spring coefficient; the resulting stiffness is approximately `193.5324`, matching the supplied file for `K = 1`. It is a structural coefficient, separate from fluid viscosity `MU`.
 
-The calculations involving `alpha` and `beta` determine the reference spacing and stiffness override in this input. The initializer still reads the point coordinates from `.vertex`: editing `alpha` or `beta` here does not regenerate the ellipse. Leave the geometry and coefficients unchanged in this lesson. [Tutorial 05](05-input-change.md) will use this input mechanism to make a controlled model change.
+The calculations involving `alpha` and `beta` determine the reference spacing and stiffness override in this input. The initializer still reads the point coordinates from `.vertex`: editing `alpha` or `beta` here does not regenerate the ellipse. Leave the geometry and coefficients unchanged in this tutorial. [Tutorial 05](05-input-change.md) will use this input mechanism to make a controlled model change.
 
-Open the complete [rubber-band application](../examples/IB/explicit/ex1/example.cpp) in the source directory. The following excerpts are parts of that application to read in place; you do not need to add or change code for this lesson.
+Open the complete [rubber-band application](../examples/IB/explicit/ex1/example.cpp) in the source directory. The following excerpts are parts of that application to read in place; you do not need to add or change code for this tutorial.
 
 ### Add the IB method and coupled integrator
 
@@ -247,7 +247,7 @@ ib_method_ops->registerIBLagrangianForceFunction(ib_force_fcn);
 
 The initializer receives its name and the `IBStandardInitializer` input database. The registration call connects it to `IBMethod` and starts the initializer's setup, including reading the vertex and spring files and applying the input overrides. The selected structure name therefore determines which files must be present in the run directory. Later, hierarchy initialization uses that prepared information to place the structure data on the hierarchy.
 
-`IBStandardForceGen` is created separately from the initializer because supplying starting data and evaluating forces during motion are different jobs. Registering this generator selects the force provider; it does not calculate a force at that line. During advancement, `IBMethod` asks this registered generator to evaluate forces from the current structure state and initialized spring parameters. These four-column records use the default spring-force function, with index `0`, so the standard generator applies the spring law above. A later programming lesson will use its `registerSpringForceFunction` interface to supply a different spring law while retaining the surrounding fluid and IB setup.
+`IBStandardForceGen` is created separately from the initializer because supplying starting data and evaluating forces during motion are different jobs. Registering this generator selects the force provider; it does not calculate a force at that line. During advancement, `IBMethod` asks this registered generator to evaluate forces from the current structure state and initialized spring parameters. These four-column records use the default spring-force function, with index `0`, so the standard generator applies the spring law above. A later programming tutorial will use its `registerSpringForceFunction` interface to supply a different spring law while retaining the surrounding fluid and IB setup.
 
 This separation lets one application choose geometry and structural forces while reusing the fluid solver and the IB coupling. To follow the data path, trace `structure_names` to the initializer, the spring parameters to the force generator, and those two registration calls to `ib_method_ops`.
 
@@ -329,6 +329,6 @@ The allowed step is now obtained from the coupled integrator. Its advance coordi
 
 ## Before moving on
 
-This lesson ran a coupled IB simulation, read the point and spring files, and followed how the initializer, force generator, IB method, and fluid solver are connected. You should have a built rubber-band executable, a complete `elastic-loop` run with both visualization sequences, saved initial and later images with the fluid and structure matched in time, and width, height, and aspect-ratio measurements for both states.
+This tutorial ran a coupled IB simulation, read the point and spring files, and followed how the initializer, force generator, IB method, and fluid solver are connected. You should have a built rubber-band executable, a complete `elastic-loop` run with both visualization sequences, saved initial and later images with the fluid and structure matched in time, and width, height, and aspect-ratio measurements for both states.
 
 [Tutorial 05](05-input-change.md) will change a model parameter through the rubber band's input file and compare a second run with this baseline. You will follow the active input coefficient and keep the outputs separate for a comparison at the same physical time.

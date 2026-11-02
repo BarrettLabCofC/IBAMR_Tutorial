@@ -1,18 +1,18 @@
-# Lesson 02: See what the flow is doing
+# Tutorial 02: See what the flow is doing
 
 ## Introduction
 
-Open the two runs from lesson 01 in VisIt, select fields and saved times, and export comparable images.
+Open the two runs from tutorial 01 in VisIt, select fields and saved times, and export comparable images.
 
 ## Before you start
 
-Finish both runs in [lesson 01](01-first-run.md). Use VisIt with its SAMRAI reader available.
+Finish both runs in [tutorial 01](01-first-run.md). Use VisIt with its SAMRAI reader available.
 
 Open `examples/navier_stokes/ex1/first-flow/viz_INS2d/dumps.visit` under `EXAMPLES_BUILD`, the example repository's build directory.
 
 ## Opening the saved example
 
-This lesson works with the completed runs from tutorial 01.
+This tutorial works with the completed runs from tutorial 01.
 
 ### Draw the fluid output
 
@@ -160,6 +160,6 @@ The `Omega` plot displays a signed scalar already saved by IBAMR. Use the same c
 
 ## Before moving on
 
-This lesson opened a saved time sequence in VisIt, plotted vorticity and speed, and compared two runs at the same physical time with consistent display settings. You should have saved comparison images for the baseline and higher-viscosity runs at $t=1$, with the input, log, and complete visualization output retained in each run directory.
+This tutorial opened a saved time sequence in VisIt, plotted vorticity and speed, and compared two runs at the same physical time with consistent display settings. You should have saved comparison images for the baseline and higher-viscosity runs at $t=1$, with the input, log, and complete visualization output retained in each run directory.
 
 In [tutorial 03](03-kinetic-energy.md), you will add a kinetic-energy calculation to the fluid application. You will access the velocity data and save a measurement after each time step.

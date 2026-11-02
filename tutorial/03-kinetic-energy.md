@@ -1,4 +1,4 @@
-# Lesson 03: Compute kinetic energy
+# Tutorial 03: Compute kinetic energy
 
 ## Introduction
 
@@ -18,7 +18,7 @@ tail -n 15 INS2d.log
 head -n 4 viz_INS2d/dumps.visit
 ```
 
-You already have the simulated velocity field and its saved time sequence. This lesson adds a measurement of that velocity to the program. The energy calculation must be implemented before you can build and run the new executable; the original fluid application remains available throughout.
+You already have the simulated velocity field and its saved time sequence. This tutorial adds a measurement of that velocity to the program. The energy calculation must be implemented before you can build and run the new executable; the original fluid application remains available throughout.
 
 ## Follow the existing fluid application
 
@@ -167,7 +167,7 @@ At this call the gridding algorithm creates patches and the integrator initializ
 
 Our one-level run still uses this infrastructure, but creates no finer levels. `REF_RATIO` only affects finer levels when they exist. The same application setup can therefore support a uniform teaching grid and a later locally refined run.
 
-`periodic_dimension = 1,1` specifies the two periodic directions. The application recognizes this geometry and does not register physical-boundary coefficient objects for these directions. A later cylinder lesson introduces actual inlet/outlet coefficients and their meanings.
+`periodic_dimension = 1,1` specifies the two periodic directions. The application recognizes this geometry and does not register physical-boundary coefficient objects for these directions. A later cylinder tutorial introduces actual inlet/outlet coefficients and their meanings.
 
 Now find these lines inside the time loop:
 
@@ -187,7 +187,7 @@ Trace `END_TIME` through the input's `end_time` entry, then locate `getEndTime()
 
 ## The input and program
 
-Read the supplied [fluid application](../examples/navier_stokes/ex1/example.cpp) as the starting point. In this lesson you will create a source copy and add a complete diagnostic function to it.
+Read the supplied [fluid application](../examples/navier_stokes/ex1/example.cpp) as the starting point. In this tutorial you will create a source copy and add a complete diagnostic function to it.
 
 ### The quantity to compute
 
@@ -463,6 +463,6 @@ Each time now has a `KINETIC_ENERGY_MANUAL` line from the loops and a `KINETIC_E
 
 ## Before moving on
 
-This lesson followed the fluid application from input settings through initialization and time advancement, computed kinetic energy by looping over levels, patches, and side indices, then used the documented `dot` operation to perform the same weighted calculation. You should have the modified `kinetic_energy.cpp`, the rebuilt `main2d_energy` executable, a `kinetic_energy_manual.curve` file, and a comparison run's `stdout.log` containing both manual and `dot` results at matching times. Keep these results with their run inputs and visualization output.
+This tutorial followed the fluid application from input settings through initialization and time advancement, computed kinetic energy by looping over levels, patches, and side indices, then used the documented `dot` operation to perform the same weighted calculation. You should have the modified `kinetic_energy.cpp`, the rebuilt `main2d_energy` executable, a `kinetic_energy_manual.curve` file, and a comparison run's `stdout.log` containing both manual and `dot` results at matching times. Keep these results with their run inputs and visualization output.
 
 In [tutorial 04](04-elastic-loop.md), you will add an elastic rubber band to the fluid simulation and view the fluid and structure outputs together at matching times.

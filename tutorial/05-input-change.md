@@ -1,4 +1,4 @@
-# Lesson 05: Change the model through its input
+# Tutorial 05: Change the model through its input
 
 ## Introduction
 
@@ -6,7 +6,7 @@ Make the elastic rubber band stiffer by changing one input parameter. Run the sa
 
 ## Before you start
 
-Complete [tutorial 04](04-elastic-loop.md), including its `elastic-loop` run and fluid–structure overlay. Keep `EXAMPLES_SRC` and `EXAMPLES_BUILD` set in your terminal. This lesson reuses `examples/IB/explicit/ex1` and its existing `main2d` executable. No new source file or build target is needed.
+Complete [tutorial 04](04-elastic-loop.md), including its `elastic-loop` run and fluid–structure overlay. Keep `EXAMPLES_SRC` and `EXAMPLES_BUILD` set in your terminal. This tutorial reuses `examples/IB/explicit/ex1` and its existing `main2d` executable. No new source file or build target is needed.
 
 ## Running the example
 
@@ -170,6 +170,6 @@ This is already the value in the supplied tutorial input. It makes both simulati
 
 ## Before moving on
 
-This lesson changed spring stiffness through the input, traced the override into the force calculation, and compared separate runs at the same physical time. You should have the original `elastic-loop` run, a new `elastic-loop-stiff` run using the same executable, and comparison images and shape measurements retained with their respective inputs and logs.
+This tutorial changed spring stiffness through the input, traced the override into the force calculation, and compared separate runs at the same physical time. You should have the original `elastic-loop` run, a new `elastic-loop-stiff` run using the same executable, and comparison images and shape measurements retained with their respective inputs and logs.
 
 [Tutorial 06](06-refinement.md) will use this rubber-band model to introduce finer fluid cells and matching structure-point spacing. You will inspect the grid and compare a measurement while keeping the physical model fixed.

@@ -1,6 +1,6 @@
 # Rubber-band stiffness comparison
 
-`F03-baseline.png` and `F03-stiff.png` show actual IBAMR 0.20.0-pre results rendered with VisIt 3.4.2. Created for tutorial 05 on 2026-10-29 to compare one input change at equal physical time.
+`F03-baseline.png` and `F03-stiff.png` show actual IBAMR v0.19.0 results rendered with VisIt 3.4.2. Created for tutorial 05 on 2026-10-29 to compare one input change at equal physical time.
 
 - Starting input and structure files: `examples/IB/explicit/ex1/input2d`, `curve2d_64.vertex`, and `curve2d_64.spring`.
 - Baseline uses the supplied input, `K = 1.0`. The comparison changes only `K` to `2.0`; the existing `DT` expression supplies a smaller step bound. Both end at time `0.1`.
@@ -12,3 +12,5 @@
 - Baseline height/width approximately `1.4336`; comparison approximately `1.0332`. These are transient results at time `0.1`.
 
 The baseline figure was freshly rerun with the same files as tutorial 04. The two captions and the corresponding input change are given in tutorial 05. Both images were visually inspected. Complete capture settings and numerical query results are retained in the author validation records.
+
+Regenerated from fresh v0.19.0 opt-build runs on 2026-10-30. Saved times, scalar ranges, and structure extents were queried before visual inspection.
