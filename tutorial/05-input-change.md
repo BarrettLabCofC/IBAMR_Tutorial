@@ -52,7 +52,7 @@ cd "$EXAMPLES_BUILD/examples/IB/explicit/ex1/elastic-loop-stiff"
 tail -n 15 stdout.log
 ```
 
-Confirm that the final reported simulation time is `0.1`. The program writes a new `IB2d.log` and `viz_IB2d` here, leaving the baseline output in `elastic-loop`.
+Confirm that the final reported simulation time is `0.6`. The program writes a new `IB2d.log` and `viz_IB2d` here, leaving the baseline output in `elastic-loop`.
 
 The log records the input database used by this run. Open `IB2d.log` and find `K`, `uniform_spring_stiffness`, and the integrators' `dt_max` entries. They should correspond to `K = 2`, stiffness approximately `387.065` in the printed database, and a time-step bound of `0.000125`. These values check that the intended input reached the initialized model.
 
@@ -64,30 +64,30 @@ Use the fluid-pressure and black rubber-band overlay from tutorial 04 for each r
 
 For the new run, create a **Time** database correlation for its fluid and structure files, using a distinct name such as `stiff_time`. Follow tutorial 04's correlation steps. Set the pressure limits to `-10` and `10` and use `hot_desaturated` for **both** runs. These shared limits replace the limits used for tutorial 04's single-run view.
 
-Select physical time `0.1` in each run. The baseline has 21 saved states and the stiffer case has 41, because `Main.viz_dump_interval = 20` counts steps and the stiffer case takes smaller steps. Their final zero-based state indices are `20` and `40`. Comparing the same slider index would compare different physical times. Read the displayed time when switching between runs.
+Select physical time `0.6` in each run. The baseline has 121 saved states and the stiffer case has 241, because `Main.viz_dump_interval = 20` counts steps and the stiffer case takes smaller steps. Their final zero-based state indices are `120` and `240`. Comparing the same slider index would compare different physical times. Read the displayed time when switching between runs.
 
-![Baseline rubber band and pressure at time 0.1](figures/F03-baseline.png)
+![Baseline rubber band and pressure at time 0.6](figures/F03-baseline.png)
 
-*Baseline, `K = 1.0`, at time `0.1`. Pressure limits are `[-10,10]`; the black mesh shows the rubber band.*
+*Baseline, `K = 1.0`, at time `0.6`. Pressure limits are `[-10,10]`; the black mesh shows the rubber band.*
 
-![Stiffer rubber band and pressure at time 0.1](figures/F03-stiff.png)
+![Stiffer rubber band and pressure at time 0.6](figures/F03-stiff.png)
 
 *Stiffer rubber band, `K = 2.0`, at the same time and with the same view and pressure limits. Both figures use actual IBAMR output.*
 
 ### Measure and save the comparison
 
-Select the structure mesh plot and use **Controls → Query → Spatial Extents**, as in tutorial 04. At time `0.1`, record the width, height, and height/width ratio for each run. The initial bounds should match because the vertex files are unchanged.
+Select the structure mesh plot and use **Controls → Query → Spatial Extents**, as in tutorial 04. At time `0.6`, record the width, height, and height/width ratio for each run. The initial bounds should match because the vertex files are unchanged.
 
-The checked runs give these values at time `0.1`:
+The checked runs give these values at time `0.6`:
 
 | Run | Width | Height | Height/width |
 | --- | --- | --- | --- |
-| Baseline, `K = 1.0` | `0.4044` | `0.5797` | `1.4336` |
-| Stiffer band, `K = 2.0` | `0.4865` | `0.5026` | `1.0332` |
+| Baseline, `K = 1.0` | `0.4307` | `0.5718` | `1.3275` |
+| Stiffer band, `K = 2.0` | `0.5677` | `0.4386` | `0.7726` |
 
-Both start with height/width approximately `1.9600`. At time `0.1`, the stiffer band has a ratio closer to one: its width and height are more similar. The pressure field also differs, as shown on the shared color scale. These are transient shapes at the selected time.
+Both start with height/width approximately `1.9600`. At time `0.6`, the baseline band is taller than it is wide, while the stiffer band is wider than it is tall. Play the two sequences to see how the stiffness changes the timing of the motion.
 
-Save the measurements alongside each run's input and log, including `K` and physical time. Save a PNG of each final overlay using the same view, color table, and limits. Use names such as `band-K1-pressure-t0.1.png` and `band-K2-pressure-t0.1.png`.
+Save the measurements alongside each run's input and log, including `K` and physical time. Save a PNG of each final overlay using the same view, color table, and limits. Use names such as `band-K1-pressure-t0.6.png` and `band-K2-pressure-t0.6.png`.
 
 ## The input and program
 
@@ -163,7 +163,7 @@ For the existing grid, `DX_FINEST = 1/64`. Changing `K` from `1.0` to `2.0` chan
 Keep the final time independent of `K`:
 
 ```text
-END_TIME = 0.1
+END_TIME = 0.6
 ```
 
 This is already the value in the supplied tutorial input. It makes both simulations stop at the same physical time even though they take different numbers of steps. No other input changes are required.

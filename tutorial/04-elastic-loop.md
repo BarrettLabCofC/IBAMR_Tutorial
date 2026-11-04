@@ -32,7 +32,7 @@ cd elastic-loop
 
 The application reads the structure files from the run directory. The `.vertex` file supplies point positions, and the `.spring` file supplies connections and spring parameters. If `elastic-loop` already exists, use a fresh run-directory name.
 
-Let the run finish. Its last time-step messages should report simulation time `0.1`, set by `END_TIME = 0.1` in the supplied input.
+Let the run finish. Its last time-step messages should report simulation time `0.6`, set by `END_TIME = 0.6` in the supplied input.
 
 Check the outputs in the run directory:
 
@@ -51,7 +51,7 @@ There are now two visualization sequences:
 | `viz_IB2d/dumps.visit` | Fluid velocity, pressure, and other requested fluid fields |
 | `viz_IB2d/lag_data.visit` | Structure points and their connections |
 
-`VisIt` enables the fluid writer and `Silo` enables the structure writer. The application writes both sequences together; the supplied input produces 21 matching states from time `0` to `0.1`. Keep the entire `viz_IB2d` directory, since the two `.visit` files refer to the numbered data directories within it.
+`VisIt` enables the fluid writer and `Silo` enables the structure writer. The application writes both sequences together; the supplied input produces 121 matching states from time `0` to `0.6`. Keep the entire `viz_IB2d` directory, since the two `.visit` files refer to the numbered data directories within it.
 
 ### View the rubber band and fluid together
 
@@ -60,7 +60,7 @@ Use a fresh VisIt window or remove the plots from tutorial 02. Work with the two
 1. Open `dumps.visit`. Add **Pseudocolor → P** and **Draw**. Set the color table to `hot_desaturated` and explicit limits to `-5` and `5`.
 2. Open `lag_data.visit` as an additional source. Keep the pressure plot from `dumps.visit`, and add **Mesh → curve2d_64_mesh** from `lag_data.visit`. Set the mesh color to black and increase the line width if needed, then **Draw**. The structure should appear inside the fluid plot.
 3. Open **Controls → Database correlations** and create a new correlation named `loop_time`. Choose the **Time** method and add both `dumps.visit` and `lag_data.visit` to its **Correlated sources** list. Create the correlation, then select `loop_time` as the **Active time slider**.
-4. Select the first state, at time `0`, then advance to the final state, at time `0.1`. The correlation moves both datasets together. Keep this common time slider selected when playing the sequence.
+4. Select the first state, at time `0`, then advance to the final state, at time `0.6`. The correlation moves both datasets together. Keep this common time slider selected when playing the sequence.
 
 A correlation connects the two saved time sequences; opening both files alone does not ensure that moving one file's slider updates the other. See the [VisIt database-correlation documentation](https://visit-sphinx-github-user-manual.readthedocs.io/en/3.4rc/using_visit/MultipleDatabaseAndWindows/Database_correlations.html) for the controls. In this case both writers saved the same times, so their states match directly.
 
@@ -70,7 +70,7 @@ A correlation connects the two saved time sequences; opening both files alone do
 
 ![Later rubber band over fluid pressure](figures/F02-later.png)
 
-*The same run at time `0.1`, with matching fluid and structure times and the same pressure limits. The rubber band is wider and shorter, with higher pressure inside it. This is a short transient run.*
+*The same run at time `0.6`, with matching fluid and structure times and the same pressure limits. The rubber band is taller than it is wide again, with higher pressure inside it.*
 
 The rubber-band overlay shows the current point connections. To inspect the individual points, you can select the structure mesh named `curve2d_64_vertices`. Keep `curve2d_64_mesh` for the continuous rubber-band view used here.
 
@@ -86,16 +86,18 @@ H=y_{\max}-y_{\min},\qquad
 \text{aspect ratio}=\frac{H}{W}.
 $$
 
-Advance the correlated time slider to the final state and repeat the query with the structure plot still selected. The checked output gives:
+Repeat the query near times `0.27` and `0.55`, then at the final state. The checked output gives:
 
 | Simulation time | Width $W$ | Height $H$ | Aspect ratio $H/W$ |
 | --- | --- | --- | --- |
 | `0` | `0.3571` | `0.7000` | `1.9600` |
-| `0.1` | `0.4044` | `0.5797` | `1.4336` |
+| `0.27` | `0.6321` | `0.3763` | `0.5953` |
+| `0.55` | `0.4198` | `0.5894` | `1.4040` |
+| `0.60` | `0.4307` | `0.5718` | `1.3275` |
 
 The decreasing ratio measures the change from a tall band toward a shape with more similar width and height. Save your measurements in a text file alongside the run's input and log. Select the structure plot for this query: selecting the fluid plot would measure the fluid domain instead of the rubber band.
 
-Save an image at time `0` and another at time `0.1` in the run directory under the build directory. Use the same view, pressure limits `[-5,5]`, and black rubber-band overlay for both. Give the files descriptive names such as `band-pressure-t0.png` and `band-pressure-t0.1.png`. Keep the pressure legend and simulation time visible, with `loop_time` selected as the common time slider.
+Save an image at time `0` and another at time `0.6` in the run directory under the build directory. Use the same view, pressure limits `[-5,5]`, and black rubber-band overlay for both. Give the files descriptive names such as `band-pressure-t0.png` and `band-pressure-t0.6.png`. Keep the pressure legend and simulation time visible, with `loop_time` selected as the common time slider.
 
 If the rubber band does not appear, check that the Mesh plot uses `lag_data.visit` and `curve2d_64_mesh`, while the pressure plot still uses `dumps.visit`. If the application cannot find the structure files, check that both `curve2d_64.vertex` and `curve2d_64.spring` were copied alongside the run's `input2d`.
 
@@ -167,7 +169,7 @@ $$
 
 Here $\mathbf X_i$ and $\mathbf X_j$ are current point positions, $\ell_{ij}$ is their separation, $\ell_{0,ij}$ is the spring's resting length, and $\kappa_{ij}$ is its stiffness. The force on $j$ is equal and opposite. A stretched spring pulls its endpoints toward one another. Each point receives contributions from its neighboring springs.
 
-The resting lengths in this file are zero. The initial ellipse is therefore under tension; its starting distances are not the springs' resting lengths. The structure forces act on the fluid, and the resulting fluid velocity moves the points. The saved frames show the initially stretched rubber band becoming wider and shorter. This short run does not establish an equilibrium shape or exact conservation of enclosed area.
+The resting lengths in this file are zero. The initial ellipse is therefore under tension; its starting distances are not the springs' resting lengths. The structure forces act on the fluid, and the resulting fluid velocity moves the points. The band widens and shortens, overshoots a round shape, then swings back. In the saved frames, its height-to-width ratio reaches a minimum near time `0.27` and a lower local maximum near `0.55`.
 
 The input can replace coefficients supplied by the spring file. Find the following `IBStandardInitializer` block; the top-level constants used here are `PI = 3.14159265358979`, `K = 1.0`, and the existing grid settings in the input:
 
@@ -329,6 +331,6 @@ The allowed step is now obtained from the coupled integrator. Its advance coordi
 
 ## Before moving on
 
-This tutorial ran a coupled IB simulation, read the point and spring files, and followed how the initializer, force generator, IB method, and fluid solver are connected. You should have a built rubber-band executable, a complete `elastic-loop` run with both visualization sequences, saved initial and later images with the fluid and structure matched in time, and width, height, and aspect-ratio measurements for both states.
+This tutorial ran a coupled IB simulation, read the point and spring files, and followed how the initializer, force generator, IB method, and fluid solver are connected. You should have a built rubber-band executable, a complete `elastic-loop` run with both visualization sequences, saved initial and later images with the fluid and structure matched in time, and width, height, and aspect-ratio measurements across the oscillation.
 
 [Tutorial 05](05-input-change.md) will change a model parameter through the rubber band's input file and compare a second run with this baseline. You will follow the active input coefficient and keep the outputs separate for a comparison at the same physical time.

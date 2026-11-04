@@ -1,16 +1,8 @@
-# Rubber-band refinement figures
+# Classical IB refinement comparison
 
-Created 2026-10-30 from actual IBAMR v0.19.0 output, rendered with VisIt 3.4.2. The figures compare a one-level baseline with a two-level locally refined run and show where the fine patches lie.
+All frames are at time 0.6. Pressure limits are [-5,5]. Both runs use K = 1. The refined run uses two levels, refinement ratio 2, and curve2d_128. The grid image shows the refinement levels in wireframe over the structure.
 
-- Application: `examples/IB/explicit/ex1/example.cpp`, unchanged. Baseline uses the supplied tutorial `input2d` and `curve2d_64` files.
-- Refined input: `MAX_LEVELS = 2`, `REF_RATIO = 2`, and both initializer structure names changed to `curve2d_128`. The matching vertex and spring files are unchanged upstream data. Provenance is in `../../UPSTREAM.json`.
-- Both runs retain `N = 64`, `K = 1`, and `END_TIME = 0.1`. Existing expressions adjust `ds`, spring stiffness, and the step bound consistently with the finer resolution.
-- All figures show physical time `0.1`. Baseline state index `20`; refined index `40`. Time correlations synchronize each fluid and structure sequence.
-- Pressure images: `dumps.visit`, Pseudocolor `P`, `hot_desaturated`, limits `[-5,5]`, and black structure Mesh overlays. Baseline mesh `curve2d_64_mesh`; refined mesh `curve2d_128_mesh` from `lag_data.visit`.
-- Grid image: fluid Subset `levels`, Wireframe enabled, plus the refined black structure mesh. Red denotes level 0 and green denotes level 1. These are patch/level outlines rather than individual fluid cells. At this state the saved hierarchy has one coarse patch and eight fine patches.
-- Full unit-square view; 900 x 900 PNG. Fields follow the example's numerical scales without assigned dimensional units.
-- Final width/height ratios: baseline `1.4335747840`; refined `1.4020259745`. This is a two-resolution comparison, not a convergence result.
+- Baseline at time 0.6, state 120 of 121 saved states. Width 0.430722, height 0.571779, height/width 1.327490. Pressure range [-1.452588, 3.578816].
+- Refined at time 0.6, state 240 of 241 saved states. Width 0.440057, height 0.560796, height/width 1.274372. Pressure range [-1.417393, 3.594198].
 
-The three images were visually inspected. Complete run inputs/logs and capture metadata are retained with the author validation records. The figure source is IBAMR simulation data, not an illustrative reconstruction.
-
-Regenerated from fresh v0.19.0 opt-build runs on 2026-10-30. Saved times, scalar ranges, and structure extents were queried before visual inspection.
+Rendered from IBAMR v0.19.0 opt output in VisIt 3.4.2. Fluid and structure times were checked for each image. The pressure plots use hot_desaturated with a black structure overlay.

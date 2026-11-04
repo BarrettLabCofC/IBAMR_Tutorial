@@ -19,7 +19,7 @@
     "examples/IB/explicit/ex1/input2d": {
       "origin": "IBAMR examples/IB/explicit/ex1/input2d",
       "changes": {
-        "END_TIME": "0.1",
+        "END_TIME": "0.6",
         "Main.viz_dump_interval": "20",
         "Main.data_dump_interval": "0"
       }
@@ -46,6 +46,15 @@
         "END_TIME": "1.0",
         "Main.viz_dump_interval": "10",
         "IBStandardInitializer.structure_names and nested database": "cylinder2d_128"
+      }
+    },
+    "examples/IBFE/explicit/ex1/example.cpp": {
+      "origin": "IBAMR examples/IBFE/explicit/ex1/example.cpp (unchanged)"
+    },
+    "examples/IBFE/explicit/ex1/input2d": {
+      "origin": "IBAMR examples/IBFE/explicit/ex1/input2d",
+      "changes": {
+        "Main.viz_dump_interval": "10"
       }
     }
   },

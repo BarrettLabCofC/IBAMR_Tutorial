@@ -46,7 +46,7 @@ curve2d_128 {
 }
 ```
 
-Both names must change from `curve2d_64` to `curve2d_128`: the first selects the files, and the nested block configures that structure. Keep `K = 1.0`, `END_TIME = 0.1`, and the remaining input unchanged. The existing formulas calculate the new point-spacing scale, spring coefficients, and time-step bound.
+Both names must change from `curve2d_64` to `curve2d_128`: the first selects the files, and the nested block configures that structure. Keep `K = 1.0`, `END_TIME = 0.6`, and the remaining input unchanged. The existing formulas calculate the new point-spacing scale, spring coefficients, and time-step bound.
 
 ### Run the existing application
 
@@ -58,7 +58,7 @@ cd "$EXAMPLES_BUILD/examples/IB/explicit/ex1/elastic-loop-refined"
 tail -n 15 stdout.log
 ```
 
-Confirm that the run reaches physical time `0.1`. Open `IB2d.log` and check the input database: `max_levels` should be `2`, `num_node_circum` should be `608`, and the structure's `level_number` should be `1`. The log also reports regridding during the run.
+Confirm that the run reaches physical time `0.6`. Open `IB2d.log` and check the input database: `max_levels` should be `2`, `num_node_circum` should be `608`, and the structure's `level_number` should be `1`. The log also reports regridding during the run.
 
 The new fluid and structure sequences are in this run's `viz_IB2d/dumps.visit` and `viz_IB2d/lag_data.visit`. Keep both sequences and their complete data directories.
 
@@ -71,13 +71,13 @@ Use the pressure/structure overlay from tutorial 04, with these changes:
 1. Open the refined run's `dumps.visit`. If VisIt adds a **Subset → levels** plot automatically, hide it for the pressure view. Add **Pseudocolor → P**, use `hot_desaturated`, and set pressure limits to `-5` and `5`.
 2. Open the same run's `lag_data.visit` and add the black **Mesh → curve2d_128_mesh** plot. The mesh name changes with the structure name.
 3. Create a **Time** correlation for these two databases, named `refined_time`, and select it as the active time slider.
-4. Select physical time `0.1`. Use the same pressure limits and view when opening the baseline for comparison.
+4. Select physical time `0.6`. Use the same pressure limits and view when opening the baseline for comparison.
 
-The refined run has 41 saved states, compared with the baseline's 21. Its time-step bound is smaller, while `Main.viz_dump_interval = 20` still counts steps. Their final zero-based state indices are `40` and `20`; compare physical times rather than equal slider indices.
+The refined run has 241 saved states, compared with the baseline's 121. Its time-step bound is smaller, while `Main.viz_dump_interval = 20` still counts steps. Their final zero-based state indices are `240` and `120`; compare physical times rather than equal slider indices.
 
 ![Baseline rubber band over pressure](figures/F04-baseline.png)
 
-*Original one-level run at time `0.1`, using `curve2d_64` and pressure limits `[-5,5]`.*
+*Original one-level run at time `0.6`, using `curve2d_64` and pressure limits `[-5,5]`.*
 
 ![Refined rubber band over pressure](figures/F04-refined.png)
 
@@ -91,22 +91,22 @@ The level outlines show where the finer region lies around the rubber band. Move
 
 ![Refinement levels and the rubber band](figures/F04-grid.png)
 
-*Actual grid-level outlines and the structure at time `0.1`. The plot shows the extent of the refinement levels; it does not draw every fluid cell.*
+*Actual grid-level outlines and the structure at time `0.6`. The plot shows the extent of the refinement levels; it does not draw every fluid cell.*
 
 To see individual cells, add **Mesh → amr_mesh** from the fluid database. This is a different mesh from `curve2d_128_mesh`: one is the fluid grid and the other is the immersed structure. Hide the fluid mesh again when comparing pressure images.
 
 ### Compare a shape measurement
 
-Use **Spatial Extents** on the structure plot, as in tutorial 04. Record width, height, and height/width for the original and refined runs at time `0.1`. Both use `K = 1`; this comparison changes the fluid and structure resolutions together.
+Use **Spatial Extents** on the structure plot, as in tutorial 04. Record width, height, and height/width for the original and refined runs at time `0.6`. Both use `K = 1`; this comparison changes the fluid and structure resolutions together.
 
-The checked runs give these values at time `0.1`:
+The checked runs give these values at time `0.6`:
 
 | Run | Width | Height | Height/width |
 | --- | --- | --- | --- |
-| Original, one level | `0.4044` | `0.5797` | `1.4336` |
-| Refined, two levels | `0.4088` | `0.5731` | `1.4020` |
+| Original, one level | `0.4307` | `0.5718` | `1.3275` |
+| Refined, two levels | `0.4401` | `0.5608` | `1.2744` |
 
-The overall motion is similar, while the refined band is slightly wider and shorter at this time. Its height/width ratio is about 2.2% lower. This gives a practical indication of the result's sensitivity to resolution; two runs alone do not establish a converged value.
+The overall motion is similar, while the refined band is slightly wider and shorter at this time. Its height/width ratio is about 4.0% lower at this time.
 
 Save your measurements with the inputs and logs. Save a grid-level image and the two pressure/structure images with their physical times in the filenames.
 
@@ -225,4 +225,4 @@ If you later apply the kinetic-energy calculation from tutorial 03 to a refined 
 
 This tutorial added a finer grid level, supplied matching structure files, inspected the level outlines, and traced how structure-based tagging places finer patches. You should have separate baseline and refined runs, pressure/structure images at matching times, a grid-level image, and shape measurements retained with the input and logs.
 
-Tutorial 07 will introduce a finite-element elastic ring. You will run it and view its element mesh alongside the fluid before changing its initial stretch in tutorial 08.
+[Tutorial 07](07-finite-element-ring.md) introduces a finite-element elastic ring. You will run it and view its element mesh alongside the fluid before changing its initial stretch in tutorial 08.
