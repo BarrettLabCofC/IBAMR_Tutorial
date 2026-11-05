@@ -54,7 +54,8 @@
     "examples/IBFE/explicit/ex1/input2d": {
       "origin": "IBAMR examples/IBFE/explicit/ex1/input2d",
       "changes": {
-        "Main.viz_dump_interval": "10"
+        "END_TIME": "2.0",
+        "Main.viz_dump_interval": "16"
       }
     }
   },
