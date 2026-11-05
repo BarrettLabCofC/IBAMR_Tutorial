@@ -2,20 +2,19 @@
 
 ## Introduction
 
-Simulate flow around a stationary cylinder. Target forces impose the prescribed lack of motion by tethering the immersed boundary points to fixed locations with very stiff springs. View the resulting flow, then follow how the application supplies these forces and the conditions at the edges of the fluid domain. Finally, change the Reynolds number through the input and relate it to the units used in the simulation.
+In tutorials 07–08, an elastic ring moved in response to its internal stress and the surrounding fluid. Here, prescribe a stationary cylinder by tethering its immersed boundary points to fixed locations with very stiff springs. View the resulting flow, then follow how the application supplies these forces and the conditions at the edges of the fluid domain. Finally, change the Reynolds number through the input and relate it to the units used in the simulation.
 
 ## Before you start
 
-This tutorial uses `examples/IB/explicit/ex2` and the build setup from [tutorial 00](00-orientation.md). It builds on tutorials 00–08, including the grid hierarchy introduced in [tutorial 06](06-refinement.md).
+This tutorial uses `examples/IB/explicit/ex2` with the existing build setup. It returns to the point-and-spring representation from [tutorial 04](04-elastic-loop.md), using the grid hierarchy introduced in [tutorial 06](06-refinement.md).
 
 ## Running the example
 
-### Configure and build the new application
+### Build the cylinder application
 
-Regenerate the repository's build configuration to include the new example, then compile it:
+Compile the cylinder example using its existing build target:
 
 ```bash
-cmake -S "$EXAMPLES_SRC" -B "$EXAMPLES_BUILD"
 cmake --build "$EXAMPLES_BUILD" --target IB-ex2-2d --parallel 4
 ```
 
@@ -45,7 +44,7 @@ The supplied input sets `END_TIME = 1.0`. The last completed step should report 
 The run produces `IB2d.log`, `viz_IB2d/dumps.visit` for the fluid, and `viz_IB2d/lag_data.visit` for the cylinder.
 
 1. Open this run's `dumps.visit` in VisIt. Hide any automatically added grid-level plot. Add **Pseudocolor → Omega**, choose `hot_desaturated`, and set limits to `-5` and `5`.
-2. Open the same run's `lag_data.visit`. Add a black **Mesh → cylinder2d_128_mesh** overlay.
+2. Open the same run's `lag_data.visit`. Add a black **Mesh → cylinder2d_128_mesh** overlay. This Silo mesh stores the point positions directly, so drawing the Mesh plot places the cylinder in its physical location. The ExodusII mesh in tutorial 07 instead needed a Displace operator to show its current coordinates.
 3. Create a **Time** database correlation named `cylinder_time` for the two databases, following [tutorial 04](04-elastic-loop.md). Select it as the active time slider and draw the plots.
 4. Move from time `0` to the final time `1`. Zoom around the cylinder; for the reference view, use horizontal bounds `-2` to `4` and vertical bounds `-2` to `2` in **View → 2D**.
 
@@ -57,7 +56,7 @@ The saved sequence shows the early flow around the held structure. Values beyond
 
 ### Check how closely the cylinder remains stationary
 
-The intended condition is that each cylinder point stays at its prescribed location. Target forces approximate the constraint force needed to impose that condition: very stiff springs tether the immersed boundary points to their fixed targets. Small displacements generate the forces that oppose the fluid loading.
+The goal is to hold each cylinder point at its prescribed location. The extent query checks the small position errors permitted by the finite target stiffness.
 
 Select the cylinder Mesh plot and query **Spatial Extents**, as in tutorial 04. Compare the bounds at times `0` and `1` as a simple check of how closely the cylinder retains its prescribed position and shape. Initially, the bounds are `[-0.5,0.5]` in both directions. At time `1`, the checked baseline bounds are approximately `[-0.49843,0.49953]` horizontally and `[-0.50105,0.50103]` vertically. The differences reflect the finite stiffness used to approximate the stationary constraint.
 
@@ -65,7 +64,7 @@ Save the vorticity/mesh overlay at time `1` in the run directory, keeping the le
 
 ## The input and program
 
-Read the supplied [application](../examples/IB/explicit/ex2/example.cpp) and [input](../examples/IB/explicit/ex2/input2d.cylinder) alongside these excerpts. The fluid/IB integrators, hierarchy helpers, and two output writers follow the setup in tutorials 03–06. The new pieces are the geometry, target parameters, and physical-boundary objects.
+Read the supplied [application](../examples/IB/explicit/ex2/example.cpp) and [input](../examples/IB/explicit/ex2/input2d.cylinder) alongside these excerpts. The hierarchy and output setup are familiar from the preceding tutorials. For the structure, this application uses `IBMethod` and `IBStandardForceGen` as in tutorial 04. The new pieces are the target parameters and physical-boundary objects.
 
 ### The cylinder and surrounding domain
 
@@ -115,7 +114,7 @@ IBStandardInitializer {
 }
 ```
 
-As before, the structure name selects the vertex and spring files. The new entries assign a target stiffness and damping coefficient to every point. The initializer uses each vertex's initial position as its target position. No separate `.target` file is needed for these uniform assignments.
+As before, the structure name selects the vertex and spring files. The new entries assign a target stiffness and damping coefficient to every point. The initializer uses each vertex's initial position as its target position.
 
 For a point with position $\mathbf X_i$, velocity $\mathbf U_i$, and fixed target $\mathbf X_i^*$, the target contribution is
 
@@ -141,7 +140,7 @@ K_s = M_s*(log(0.5)/tau_s)^2
 E_s = 2.0*sqrt(K_s*M_s)
 ```
 
-Here `DX_FINEST = 0.125` and `DT = 0.0078125`. Both the IB and selected fluid integrator receive `dt_max = DT`. `M_s` is a grid-dependent effective mass used to choose the penalty coefficients; it does not add a separately advanced massive rigid body. `tau_s` supplies the decay scale in this parameter recipe. Keep these coupled expressions unchanged for this activity.
+Here `DX_FINEST = 0.125` and `DT = 0.0078125`. Both the IB and selected fluid integrator receive `dt_max = DT`. `M_s` is a grid-dependent effective mass used in this recipe for the penalty coefficients. `tau_s` supplies the decay scale in this parameter recipe. Keep these coupled expressions unchanged for this activity.
 
 The existing application registers the providers in the same way as the rubber-band example:
 
@@ -159,15 +158,25 @@ The database supplies the uniform coefficients. Registering the initializer read
 
 For the fluid boundary-condition convention, see the documentation for [`INSHierarchyIntegrator::registerPhysicalBoundaryConditions()`](https://ibamr.github.io/IBAMR-docs/ibamr/classIBAMR_1_1INSHierarchyIntegrator.html#a3751b764c51e96a286d234b3d0e9023e). It explains how the coefficients select prescribed velocity or traction and gives the supported choices of `a` and `b`.
 
-SAMRAI's general scalar boundary interface uses
+For the default `TRACTION` treatment used here, the fluid conditions select either a velocity component or the corresponding component of the traction:
 
 $$
-a q+b\frac{\partial q}{\partial n}=g,
+a_d u_d+b_d(\boldsymbol{\sigma}\mathbf n)_d=g_d,
+\qquad
+\boldsymbol{\sigma}=-p\mathbf I+\mu(\nabla\mathbf u+\nabla\mathbf u^T).
 $$
 
-where $n$ is the outward normal. `a` weights the value, `b` weights the outward derivative, and `g` is the right-hand side. Thus `(a,b,g) = (1,0,Q)` prescribes `q = Q`, while `(0,1,H)` prescribes its outward derivative `H`. A general Robin condition combines the two. Some descriptions call the right-hand side `c`; the IBAMR keys call it `g`.
+Here $d$ identifies the velocity component and $\mathbf n$ is the outward unit normal. The fluid Cauchy stress $\boldsymbol{\sigma}$ combines pressure and viscous stress in the current configuration. It is distinct from the elastic first Piola–Kirchhoff stress $\mathbf P^e$ in tutorial 07, which describes the structure's response using reference coordinates.
 
-For the fluid solver, this interface selects velocity or traction conditions, with the pressure and velocity treatments coordinated internally. The supported coefficient pairs are `(a,b) = (1,0)` for prescribed velocity and `(0,1)` for traction. The boundary table below gives their physical meaning for each face.
+The supported coefficient pairs are `(a,b) = (1,0)` for prescribed velocity and `(0,1)` for prescribed traction. The right-hand side `g` supplies the selected velocity or traction component.
+
+These coefficients use SAMRAI's Robin boundary interface. For a scalar field, its usual form is
+
+$$
+a q+b\frac{\partial q}{\partial n}=g.
+$$
+
+In that scalar setting, `a` weights the value and `b` weights the outward derivative: `(a,b,g) = (1,0,Q)` prescribes `q = Q`, while `(0,1,H)` prescribes its outward derivative `H`. A general Robin condition combines them. Some descriptions call the right-hand side `c`; the IBAMR keys call it `g`. The fluid integrator interprets the supplied coefficients as velocity or traction conditions through its coordinated velocity and pressure boundary treatments.
 
 There are two component databases: `VelocityBcCoefs_0` configures horizontal velocity, and `VelocityBcCoefs_1` configures vertical velocity. The final suffix on each **entry** instead identifies the domain face:
 
@@ -232,7 +241,7 @@ For the default `TRACTION` treatment selected by this staggered solver, the comp
 | Right | $-p+2\mu\,\partial_x u_x=0$, $\mu(\partial_x u_y+\partial_y u_x)=0$ |
 | Bottom and top | $u_y=0$, $\mu(\partial_y u_x+\partial_x u_y)=0$ |
 
-The right face supplies zero normal and shear stress. The top and bottom combine no penetration with zero shear stress, allowing tangential flow; they are slip boundaries rather than no-slip walls. These formulas use the implemented Newtonian stress $\boldsymbol\sigma=-p\mathbf I+\mu(\nabla\mathbf u+\nabla\mathbf u^T)$. The zero-stress conditions are unchanged by reversing the outward normal at the lower face.
+The right face supplies zero normal and shear stress. The top and bottom combine no penetration with zero shear stress, allowing tangential flow; they are slip boundaries rather than no-slip walls. The zero-stress conditions are unchanged by reversing the outward normal at the lower face.
 
 Internally, the staggered solver translates the normal-traction condition into its pressure boundary treatment and an accompanying normal-velocity treatment. The tangential stress condition includes the cross derivative of normal velocity. The equations here follow the v0.19.0 staggered implementation.
 
@@ -241,21 +250,17 @@ Internally, the staggered solver translates the normal-traction condition into i
 Find the boundary setup in `example.cpp`:
 
 ```cpp
-vector<RobinBcCoefStrategy<NDIM>*> u_bc_coefs(NDIM, nullptr);
-const bool periodic_domain = grid_geometry->getPeriodicShift().min() > 0;
-if (!periodic_domain)
+for (unsigned int d = 0; d < NDIM; ++d)
 {
-    for (unsigned int d = 0; d < NDIM; ++d)
-    {
-        const std::string bc_coefs_name = "u_bc_coefs_" + std::to_string(d);
-        const std::string bc_coefs_db_name = "VelocityBcCoefs_" + std::to_string(d);
-        u_bc_coefs[d] = new muParserRobinBcCoefs(
-            bc_coefs_name, app_initializer->getComponentDatabase(bc_coefs_db_name), grid_geometry);
-    }
-    navier_stokes_integrator->registerPhysicalBoundaryConditions(u_bc_coefs);
+    const std::string bc_coefs_name = "u_bc_coefs_" + std::to_string(d);
+    const std::string bc_coefs_db_name = "VelocityBcCoefs_" + std::to_string(d);
+    u_bc_coefs[d] = new muParserRobinBcCoefs(
+        bc_coefs_name, app_initializer->getComponentDatabase(bc_coefs_db_name), grid_geometry);
+}
+navier_stokes_integrator->registerPhysicalBoundaryConditions(u_bc_coefs);
 ```
 
-This excerpt stops at registration inside the existing `if` block; read it in the supplied application. The vector has one coefficient provider per velocity component. For component `d`, the loop constructs its object name and database name, then passes that database and the domain geometry to `muParserRobinBcCoefs`.
+The application executes this loop inside its nonperiodic-domain branch. The vector `u_bc_coefs` has one coefficient provider per velocity component. For component `d`, the loop constructs its object name and database name, then passes that database and the domain geometry to `muParserRobinBcCoefs`.
 
 Construction reads and parses the expressions. Registration gives the fluid integrator access to those providers. When boundary values are needed, the solver requests coefficient arrays through `setBcCoefs`, specifying the patch, boundary face, and time. The provider evaluates the stored expressions at those locations; the solver then applies its velocity/pressure boundary treatment.
 
