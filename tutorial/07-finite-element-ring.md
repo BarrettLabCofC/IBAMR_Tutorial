@@ -398,4 +398,4 @@ In the source's final processing loop, `jacobian(FF, ...)` evaluates the coordin
 
 This tutorial ran a finite-element elastic ring, displayed its physical mesh with the fluid, and followed mesh creation, coordinate mapping, stress registration, and initialization. You should have the `elastic-ring` run, initial and final pressure/mesh images, width and height measurements, and the recorded `volume.curve` history.
 
-Tutorial 08 will change the initial stretch in `coordinate_mapping_function`, rebuild the application, and compare its initial geometry and motion with this baseline.
+[Tutorial 08](08-change-initial-stretch.md) will change the initial stretch in `coordinate_mapping_function`, rebuild the application, and compare its initial geometry and motion with this baseline.
