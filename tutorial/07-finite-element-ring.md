@@ -30,8 +30,7 @@ cd "$EXAMPLES_BUILD/examples/IBFE/explicit/ex1"
 mkdir elastic-ring
 cp "$EXAMPLES_SRC/examples/IBFE/explicit/ex1/input2d" elastic-ring/
 cd elastic-ring
-../main2d input2d > stdout.log 2>&1
-tail -n 15 stdout.log
+../main2d input2d
 ```
 
 The input sets `END_TIME = 2.0` and `DT = 0.25*DX`. With `N = 128` on one level, `DX = 1/128` and the run reaches time `2.0` after 1,024 steps.

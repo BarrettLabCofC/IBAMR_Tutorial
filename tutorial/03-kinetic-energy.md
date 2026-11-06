@@ -349,16 +349,15 @@ cd "$EXAMPLES_BUILD/examples/navier_stokes/ex1"
 mkdir first-flow-energy
 cp first-flow/input2d first-flow-energy/
 cd first-flow-energy
-../main2d_energy input2d > stdout.log 2>&1
-tail -n 10 stdout.log
+../main2d_energy input2d
 ```
 
 ## Results
 
-The redirection saves the program's messages in `stdout.log`. Extract the energy lines into a two-column file containing time and energy:
+Extract the energy lines from IBAMR's `INS2d.log` into a two-column file containing time and energy.
 
 ```bash
-awk '/^KINETIC_ENERGY_MANUAL / { print $2, $3 }' stdout.log > kinetic_energy_manual.curve
+awk '/^KINETIC_ENERGY_MANUAL / { print $2, $3 }' INS2d.log > kinetic_energy_manual.curve
 head -n 3 kinetic_energy_manual.curve
 tail -n 3 kinetic_energy_manual.curve
 ```
@@ -455,14 +454,14 @@ cd "$EXAMPLES_BUILD/examples/navier_stokes/ex1"
 mkdir first-flow-energy-dot
 cp first-flow/input2d first-flow-energy-dot/
 cd first-flow-energy-dot
-../main2d_energy input2d > stdout.log 2>&1
-grep '^KINETIC_ENERGY' stdout.log | head -n 6
+../main2d_energy input2d
+grep '^KINETIC_ENERGY' INS2d.log | head -n 6
 ```
 
 Each time now has a `KINETIC_ENERGY_MANUAL` line from the loops and a `KINETIC_ENERGY` line from `dot`. Compare values at matching times. Small differences in the last digits can occur because the sums are accumulated in a different order.
 
 ## Before moving on
 
-This tutorial followed the fluid application from input settings through initialization and time advancement, computed kinetic energy by looping over levels, patches, and side indices, then used the documented `dot` operation to perform the same weighted calculation. You should have the modified `kinetic_energy.cpp`, the rebuilt `main2d_energy` executable, a `kinetic_energy_manual.curve` file, and a comparison run's `stdout.log` containing both manual and `dot` results at matching times. Keep these results with their run inputs and visualization output.
+This tutorial followed the fluid application from input settings through initialization and time advancement, computed kinetic energy by looping over levels, patches, and side indices, then used the documented `dot` operation to perform the same weighted calculation. You should have the modified `kinetic_energy.cpp`, the rebuilt `main2d_energy` executable, a `kinetic_energy_manual.curve` file, and a comparison run's `INS2d.log` containing both manual and `dot` results at matching times. Keep these results with their run inputs and visualization output.
 
 In [tutorial 04](04-elastic-loop.md), you will add an elastic rubber band to the fluid simulation and view the fluid and structure outputs together at matching times.

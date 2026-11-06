@@ -49,6 +49,7 @@ Start with [tutorial 00](tutorial/00-orientation.md) and work through the tutori
 | [08. Change the ring’s initial stretch](tutorial/08-change-initial-stretch.md) | Change the initial stretch and compare geometry and motion |
 | [09. Hold a cylinder in a flow](tutorial/09-target-forces-and-boundaries.md) | Use target forces, follow physical boundary conditions, and explore consistent units and Reynolds number |
 | [10. Build your own rubber-band application](tutorial/10-your-rubber-band-application.md) | Create a standalone CMake project, generate the points and springs, and measure the enclosed area over time |
+| [11. Save and restart a simulation](tutorial/11-restarting.md) | Save a checkpoint, resume from it, and compare with an uninterrupted run |
 
 More tutorials and their examples will be added as the tutorial develops.
 

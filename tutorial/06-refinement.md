@@ -54,8 +54,7 @@ From the new run directory:
 
 ```bash
 cd "$EXAMPLES_BUILD/examples/IB/explicit/ex1/elastic-loop-refined"
-../main2d input2d > stdout.log 2>&1
-tail -n 15 stdout.log
+../main2d input2d
 ```
 
 Confirm that the run reaches physical time `0.6`. Open `IB2d.log` and check the input database: `max_levels` should be `2`, `num_node_circum` should be `608`, and the structure's `level_number` should be `1`. The log also reports regridding during the run.

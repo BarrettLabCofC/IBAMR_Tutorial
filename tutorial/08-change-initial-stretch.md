@@ -40,8 +40,7 @@ cd "$EXAMPLES_BUILD/examples/IBFE/explicit/ex1"
 mkdir elastic-ring-gamma005
 cp elastic-ring/input2d elastic-ring-gamma005/
 cd elastic-ring-gamma005
-../main2d input2d > stdout.log 2>&1
-tail -n 15 stdout.log
+../main2d input2d
 ```
 
 The executable generates the new initial geometry using the edited mapping. The input gives `END_TIME = 2.0` and visualization every 16 steps. Confirm that the run reaches time `2`.

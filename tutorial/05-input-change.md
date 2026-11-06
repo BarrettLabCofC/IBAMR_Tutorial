@@ -48,8 +48,7 @@ No compilation or CMake configuration is needed for this input change. Run from 
 
 ```bash
 cd "$EXAMPLES_BUILD/examples/IB/explicit/ex1/elastic-loop-stiff"
-../main2d input2d > stdout.log 2>&1
-tail -n 15 stdout.log
+../main2d input2d
 ```
 
 Confirm that the final reported simulation time is `0.6`. The program writes a new `IB2d.log` and `viz_IB2d` here, leaving the baseline output in `elastic-loop`.

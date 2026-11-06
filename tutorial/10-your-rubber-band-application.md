@@ -188,8 +188,7 @@ cd "$BAND_BUILD"
 mkdir generated
 cp "$BAND_SRC/input2d" generated/
 cd generated
-../my-rubber-band input2d > stdout.log 2>&1
-tail -n 15 stdout.log
+../my-rubber-band input2d
 ```
 
 ## Results
@@ -217,8 +216,7 @@ In `less-stretched/input2d`, change `beta = 0.35` to `beta = 0.30` in `RubberBan
 
 ```bash
 cd "$BAND_BUILD/less-stretched"
-../my-rubber-band input2d > stdout.log 2>&1
-tail -n 15 stdout.log
+../my-rubber-band input2d
 ```
 
 Compare the new `rubber_band_mesh` with the one from `generated` at time `0`. The band starts about `0.4167` wide and `0.6000` tall. The starting ellipse is closer to a circle because the coordinate function uses the new `beta` and recalculates `alpha`. With `radius` held fixed, the continuous ellipses have the same enclosed area, $\pi\alpha\beta$. Play the new sequence to see how the starting shape changes the subsequent motion.
@@ -335,7 +333,7 @@ cd "$BAND_BUILD"
 mkdir area
 cp "$BAND_SRC/input2d" area/
 cd area
-../my-rubber-band input2d > stdout.log 2>&1
+../my-rubber-band input2d
 head -n 3 band_area.curve
 tail -n 1 band_area.curve
 ```
@@ -346,4 +344,4 @@ The first data row should be at time `0` and the last at time `0.6`. For the sup
 
 You built a standalone application that generates the rubber band from input parameters. `BAND_BUILD` holds the executable and the `generated` and `less-stretched` runs. If you completed the area calculation, the `area` run also holds `band_area.curve` with the initial and subsequent areas.
 
-The next tutorial shows how to save a simulation checkpoint and resume from it.
+In [tutorial 11](11-restarting.md), you will save a simulation checkpoint and resume from it.

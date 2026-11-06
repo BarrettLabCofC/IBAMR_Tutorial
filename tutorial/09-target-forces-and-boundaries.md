@@ -31,8 +31,7 @@ cp "$EXAMPLES_SRC/examples/IB/explicit/ex2/input2d.cylinder" cylinder/
 cp "$EXAMPLES_SRC/examples/IB/explicit/ex2/cylinder2d_128.vertex" cylinder/
 cp "$EXAMPLES_SRC/examples/IB/explicit/ex2/cylinder2d_128.spring" cylinder/
 cd cylinder
-../main2d input2d.cylinder > stdout.log 2>&1
-tail -n 15 stdout.log
+../main2d input2d.cylinder
 ```
 
 The supplied input sets `END_TIME = 1.0`. The last completed step should report simulation time `1`.
@@ -356,8 +355,7 @@ The existing `MU = 2.0*R/Re` expression calculates the new viscosity. The inlet 
 
 ```bash
 cd "$EXAMPLES_BUILD/examples/IB/explicit/ex2/cylinder-Re400"
-../main2d input2d.cylinder > stdout.log 2>&1
-tail -n 15 stdout.log
+../main2d input2d.cylinder
 ```
 
 The final time should be `1`. In `IB2d.log`, the printed input database should show `Re = 400` and `MU = 0.0025`.
