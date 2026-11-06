@@ -385,4 +385,4 @@ Save the comparison images and cylinder extents at time `1`, noting the Reynolds
 
 This tutorial used stiff target springs to approximate the constraint forces holding a cylinder stationary, checked how closely its points retained the prescribed geometry, and followed the boundary expressions through component/face selection and registration with the fluid solver. You should have separate baseline and `Re = 400` runs, each with its input, structure files, log, complete visualization output, reaction-force histories, and a saved vorticity/structure image at time `1`.
 
-Tutorial 10 will use the familiar rubber-band model to create a named application of your own. You will organize its source and build target so later code changes have a clear starting point.
+In [tutorial 10](10-your-rubber-band-application.md), you will turn the familiar rubber-band example into a named application and generate its points and springs in C++.

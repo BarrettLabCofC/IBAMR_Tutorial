@@ -34,7 +34,7 @@ Replace `$HOME/sfw/ibamr/linux-dbg` with your installation directory, whether in
 
 ## Using the tutorial
 
-Start with [tutorial 00](tutorial/00-orientation.md) and work through the tutorials in order. Use this repository as your source directory, keep compiled programs and simulation runs under `build/`, and retain separate run directories for comparisons.
+Start with [tutorial 00](tutorial/00-orientation.md) and work through the tutorials in order. For the supplied examples, use this repository as your source directory and keep compiled programs and simulation runs under `build/`. Use separate run directories for comparisons.
 
 | Tutorial | What you will do |
 | --- | --- |
@@ -48,10 +48,9 @@ Start with [tutorial 00](tutorial/00-orientation.md) and work through the tutori
 | [07. Run a finite-element elastic ring](tutorial/07-finite-element-ring.md) | Run and visualize an elastic structure represented by finite elements |
 | [08. Change the ring’s initial stretch](tutorial/08-change-initial-stretch.md) | Change the initial stretch and compare geometry and motion |
 | [09. Hold a cylinder in a flow](tutorial/09-target-forces-and-boundaries.md) | Use target forces, follow physical boundary conditions, and explore consistent units and Reynolds number |
-| 10. Create a named application (planned) | Organize a personal rubber-band application and its build target |
-| 11. Implement a custom spring law (planned) | Add and compare a small C++ model change |
+| [10. Build your own rubber-band application](tutorial/10-your-rubber-band-application.md) | Create a standalone CMake project, generate the points and springs, and measure the enclosed area over time |
 
-Linked tutorials are available now; entries marked planned show the upcoming sequence. More tutorials and their examples will be added as the tutorial develops.
+More tutorials and their examples will be added as the tutorial develops.
 
 ## Repository layout
 
