@@ -50,6 +50,7 @@ Start with [tutorial 00](tutorial/00-orientation.md) and work through the tutori
 | [09. Hold a cylinder in a flow](tutorial/09-target-forces-and-boundaries.md) | Use target forces, follow physical boundary conditions, and explore consistent units and Reynolds number |
 | [10. Build your own rubber-band application](tutorial/10-your-rubber-band-application.md) | Create a standalone CMake project, generate the points and springs, and measure the enclosed area over time |
 | [11. Save and restart a simulation](tutorial/11-restarting.md) | Save a checkpoint, resume from it, and compare with an uninterrupted run |
+| [12. Bend a finite-element strip in a flow](tutorial/12-finite-element-strip.md) | Run a strip held at both ends and compare its deformation at two stiffnesses |
 
 More tutorials and their examples will be added as the tutorial develops.
 

@@ -117,4 +117,4 @@ The [finite-element ring application](../examples/IBFE/explicit/ex1/example.cpp)
 
 You saved the rubber-band state at step `1200`, resumed it at time `0.3`, and compared the resulting band with the original run at time `0.6`. The two run directories hold the checkpoint and the separate visualization sequences.
 
-This completes Fundamentals. Part II starts with a finite-element strip to explore how an immersed solid deforms when its ends are held.
+This completes Fundamentals. Part II starts with a finite-element strip held at its ends. [Tutorial 12](12-finite-element-strip.md)

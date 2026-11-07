@@ -57,6 +57,17 @@
         "END_TIME": "2.0",
         "Main.viz_dump_interval": "16"
       }
+    },
+    "examples/IBFE/explicit/ex2/example.cpp": {
+      "origin": "IBAMR examples/IBFE/explicit/ex2/example.cpp (unchanged)"
+    },
+    "examples/IBFE/explicit/ex2/input2d": {
+      "origin": "IBAMR examples/IBFE/explicit/ex2/input2d",
+      "changes": {
+        "DT": "0.0625*DX",
+        "END_TIME": "10.0",
+        "Main.viz_dump_interval": "128"
+      }
     }
   },
   "upstream_version": "0.19.0",
