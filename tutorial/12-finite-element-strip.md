@@ -221,4 +221,4 @@ At time `2`, the stiffer strip bows less than the baseline. As you play the sequ
 
 You ran a strip held at both ends, followed the fluid loading and elastic stress through the input and program, and changed the structural coefficient in C++. You should have two runs you can play in VisIt and compare at matching physical times.
 
-The next tutorial solves a finite-element mechanics problem on its own. You will see how a solid deforms under a prescribed load without a coupled fluid calculation.
+The next tutorial shows how a solid deforms under a prescribed surface load in a solid-only calculation. [Tutorial 13](13-cooks-membrane.md)

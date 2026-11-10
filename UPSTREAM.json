@@ -68,6 +68,24 @@
         "END_TIME": "10.0",
         "Main.viz_dump_interval": "128"
       }
+    },
+    "examples/fe_mechanics/ex0/example.cpp": {
+      "origin": "IBAMR examples/fe_mechanics/ex0/example.cpp (unchanged)"
+    },
+    "examples/fe_mechanics/ex0/input2d": {
+      "origin": "IBAMR examples/fe_mechanics/ex0/input2d",
+      "changes": {
+        "END_TIME": "4.0",
+        "Main.viz_dump_interval": "80"
+      }
+    },
+    "examples/fe_mechanics/ex0/input3d": {
+      "origin": "IBAMR examples/fe_mechanics/ex0/input3d",
+      "changes": {
+        "DT": "0.025*CFL_MAX*DX/U_MAX",
+        "END_TIME": "4.0",
+        "Main.viz_dump_interval": "80"
+      }
     }
   },
   "upstream_version": "0.19.0",

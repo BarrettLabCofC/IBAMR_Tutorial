@@ -1,0 +1,11 @@
+add_executable(fe_mechanics-ex0-2d example.cpp)
+target_link_libraries(fe_mechanics-ex0-2d PRIVATE IBAMR::IBAMR2d)
+set_target_properties(fe_mechanics-ex0-2d PROPERTIES OUTPUT_NAME main2d)
+
+if(TARGET IBAMR::IBAMR3d)
+  add_executable(fe_mechanics-ex0-3d example.cpp)
+  target_link_libraries(fe_mechanics-ex0-3d PRIVATE IBAMR::IBAMR3d)
+  set_target_properties(fe_mechanics-ex0-3d PROPERTIES OUTPUT_NAME main3d)
+else()
+  message(STATUS "Tutorial 13 requires IBAMR with 3D support. The fe_mechanics-ex0-3d target is unavailable.")
+endif()
