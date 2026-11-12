@@ -24,6 +24,23 @@ This tutorial works with the completed runs from tutorial 01.
 
 *Reference IBAMR result at $t=0$. Two narrow bands mark the initial shear layers. This image uses vorticity limits $[-80,80]$, which you will set below for consistent comparisons.*
 
+### Find your way around the interface
+
+The main controls contain the open databases, time controls, and plot list. The visualization window displays the plots. Here, a **database** is the saved simulation output opened through `dumps.visit`.
+
+The plot list shows which variables you are displaying and how they are drawn. Click a plot's row to select it before changing its settings. **Hide/Show** toggles its visibility, while **Delete** removes it from the list. Double-clicking a plot opens its attributes, such as its color limits.
+
+VisIt provides several tools that you will use throughout the guide:
+
+| Tool | What it does | Example |
+| --- | --- | --- |
+| Plot | Draws a variable | Pseudocolor maps `Omega` to colors; Vector draws arrows for `U` |
+| Expression | Calculates a new variable from existing fields | Compute speed from `U` |
+| Operator | Changes the data used by a plot | Clip shows a selected region; Slice cuts through a 3D field |
+| Query | Reports a measurement | Find the minimum and maximum of `Omega` |
+
+The [VisIt interface overview](https://visit-sphinx-github-user-manual.readthedocs.io/en/3.4rc/intro/Understanding_how_VisIt_works.html) explains these tools in more detail.
+
 ### Explore saved times and color limits
 
 1. Double-click the Pseudocolor plot to open its attributes. Enable explicit minimum and maximum limits, set them to `-80` and `80`, choose `hot_desaturated` as the color table, and apply.
@@ -33,25 +50,44 @@ This tutorial works with the completed runs from tutorial 01.
 
 *The same run at $t=1$, using the same limits. The bands have rolled into rotating regions. This deliberately coarse teaching grid also leaves visible small-scale numerical texture; the picture is not an accuracy assessment.*
 
-### Look at speed
+### Create an expression for speed
 
-Speed is the magnitude of velocity, $|\mathbf u|=\sqrt{u_x^2+u_y^2}$. To give it a clear scalar name, open **Controls → Expressions**, create a scalar expression called `speed`, and enter:
+Use **Controls → Expressions** to define new quantities to plot from saved fields. Select an expression in the left list to edit its formula in **Definition**.
 
-```text
-magnitude(<U>)
-```
+Speed is the magnitude of velocity, $|\mathbf u|=\sqrt{u_x^2+u_y^2}$. Create it as follows:
 
-Apply the expression. Hide the `Omega` plot and add **Pseudocolor → speed**, then **Draw**. Let this speed plot choose its own limits: the signed vorticity range is inappropriate for speed.
+1. Click **New**, name the expression `speed`, and choose the scalar type.
+2. Enter this definition:
 
-Compare the speed and vorticity views at $t=1$. The fastest fluid and the strongest local rotation need not occur in the same places. For flow direction, a vector plot of `U` would add information that speed alone cannot provide.
+   ```text
+   magnitude(<U>)
+   ```
+
+3. Click **Apply**, then hide `Omega` and choose **Add → Pseudocolor → speed**. Click **Draw**.
+
+Here `U` is the saved velocity vector, `<U>` refers to that database variable, and `magnitude` is a **built-in VisIt function** that returns its length. `speed` is the name you chose for the result.
+
+**Insert Function…** browses built-in functions and inserts templates; **Insert Variable…** supplies database variables. Functions such as `magnitude`, `sqrt`, `abs`, and `dot` can be combined with arithmetic. The [expression documentation](https://visit-sphinx-github-user-manual.readthedocs.io/en/develop/using_visit/Quantitative/Expressions.html) lists their arguments and results.
+
+Let the speed plot choose its own color limits. The signed vorticity range is inappropriate for speed. VisIt computes this quantity from the saved velocity as you change states, so no new IBAMR run is needed.
+
+### Show velocity directions
+
+To see direction as well as speed, hide the speed plot and choose **Add → Vector → U**, then **Draw**. The arrows show the local velocity direction.
+
+Double-click the Vector plot to open its attributes. Reduce the number of arrows with **Fixed vectors** or **Stride** if they overlap, and adjust **Scale** to make them readable. With **Scale by magnitude** enabled, faster velocities have longer arrows. These display controls change the arrows drawn from the saved field. See the [Vector plot documentation](https://visit-sphinx-github-user-manual.readthedocs.io/en/develop/using_visit/Plots/PlotTypes/VectorPlot.html) for its options.
+
+You can also show the Vector plot together with the speed Pseudocolor plot: the colors show speed and the arrows show direction.
 
 ### Open the comparison run
 
-Return to `Omega`. Open `examples/navier_stokes/ex1/first-flow-viscous/viz_INS2d/dumps.visit` under the build directory, make a Pseudocolor plot of `Omega`, and select its final physical time `1`. Set the same color table and limits `-80` and `80`. Save an image of each run at that time before switching between them.
+Hide the speed and Vector plots. Select the existing `Omega` plot and use **Hide/Show** to display it again. Open `examples/navier_stokes/ex1/first-flow-viscous/viz_INS2d/dumps.visit` under the build directory, make a Pseudocolor plot of `Omega`, and select its final physical time `1`. Set the same color table and limits `-80` and `80`. Save an image of each run at that time before switching between them.
 
 ![Higher-viscosity result](figures/F01-viscous.png)
 
 *IBAMR result with `MU = 0.001` at $t=1$, with the same vorticity limits. The structures are broader and their peak vorticity is weaker than in the baseline.*
+
+To measure the field, select the `Omega` plot in the plot list and open **Controls → Query**. Choose **MinMax** (under **Variable-related**), then click **Query**. The results give the minimum, maximum, and their locations for the selected state. Repeat for the other run at time `1`. The larger of the absolute minimum and absolute maximum is the maximum absolute vorticity. These values describe the field, even when the chosen color limits clip it. See the [VisIt query walkthrough](https://visit-sphinx-github-user-manual.readthedocs.io/en/v3.5.0/tutorials/Data_Analysis.html#variable-related).
 
 In the reference output, the maximum absolute saved vorticity at $t=1$ was approximately `56.02` for `MU = 0.0001` and `23.78` for `MU = 0.001`. These are VisIt MinMax queries on the saved field, not analytic predictions. Larger viscosity smooths velocity gradients. The numbers support the observation for this grid and short run; they do not establish a converged result.
 
@@ -160,6 +196,6 @@ The `Omega` plot displays a signed scalar already saved by IBAMR. Use the same c
 
 ## Before moving on
 
-This tutorial opened a saved time sequence in VisIt, plotted vorticity and speed, and compared two runs at the same physical time with consistent display settings. You should have saved comparison images for the baseline and higher-viscosity runs at $t=1$, with the input, log, and complete visualization output retained in each run directory.
+This tutorial opened a saved time sequence in VisIt, plotted vorticity, defined speed with a built-in expression function, displayed velocity arrows, and queried field values. You compared two runs at the same physical time with consistent display settings. You should have saved comparison images for the baseline and higher-viscosity runs at $t=1$, with the input, log, and complete visualization output retained in each run directory.
 
 In [tutorial 03](03-kinetic-energy.md), you will add a kinetic-energy calculation to the fluid application. You will access the velocity data and save a measurement after each time step.
