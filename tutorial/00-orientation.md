@@ -118,11 +118,15 @@ The example's `CMakeLists.txt` describes how to build it. The source and build d
 
 Open `examples/navier_stokes/ex1/example.cpp` in the source directory. For this first reading, find `main` and the following two excerpts. They are parts of the existing application, not complete programs to copy into a new file.
 
+**Read:** [`example.cpp`, line 61](../examples/navier_stokes/ex1/example.cpp#L61).
+
 ```cpp
 IBTKInit ibtk_init(argc, argv, MPI_COMM_WORLD);
 ```
 
 `main` is where the executable begins. `argc` and `argv` describe its command-line arguments, including the input filename. `IBTKInit` initializes IBAMR's supporting libraries and arranges their shutdown. `MPI_COMM_WORLD` identifies the group of processes used by the application; our first run uses one process.
+
+**Read:** [`example.cpp`, lines 68–69](../examples/navier_stokes/ex1/example.cpp#L68-L69).
 
 ```cpp
 Pointer<AppInitializer> app_initializer = new AppInitializer(argc, argv, "INS.log");
@@ -139,6 +143,8 @@ The sequence matters: initialize the libraries first, read the application input
 
 The example's [CMakeLists.txt](../examples/navier_stokes/ex1/CMakeLists.txt) contains:
 
+**Read:** [`CMakeLists.txt`, lines 1–3](../examples/navier_stokes/ex1/CMakeLists.txt#L1-L3).
+
 ```cmake
 add_executable(navier_stokes-ex1-2d example.cpp)
 target_link_libraries(navier_stokes-ex1-2d PRIVATE IBAMR::IBAMR2d)
@@ -152,6 +158,8 @@ The spatial dimension is chosen when compiling: the supplied `main2d` links to `
 ### An input setting and a source change
 
 To see how an input file controls a simulation setting, open `examples/navier_stokes/ex1/input2d` in the source directory and find:
+
+**Read:** [`input2d`, line 2](../examples/navier_stokes/ex1/input2d#L2).
 
 ```text
 MU  = 0.0001

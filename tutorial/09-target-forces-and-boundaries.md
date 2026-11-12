@@ -69,6 +69,8 @@ Read the supplied [application](../examples/IB/explicit/ex2/example.cpp) and [in
 
 The input sets:
 
+**Read:** [`input2d.cylinder`, lines 2–13](../examples/IB/explicit/ex2/input2d.cylinder#L2-L13) (selected top-level settings, grouped below by purpose).
+
 ```text
 R = 0.5
 Re = 200.0
@@ -86,6 +88,8 @@ The supplied vertex coordinates describe the radius-`0.5` circle centered at the
 
 Unlike the earlier periodic square, this input uses:
 
+**Read:** [`input2d.cylinder`, lines 189–194](../examples/IB/explicit/ex2/input2d.cylinder#L189-L194).
+
 ```text
 CartesianGeometry {
    domain_boxes = [ (0,0),(2*N - 1,N - 1) ]
@@ -100,6 +104,8 @@ The physical domain is `-8 <= x <= 24`, `-8 <= y <= 8`. Its coarse grid has `2*N
 ### Impose prescribed motion with target points
 
 Find the initializer settings:
+
+**Read:** [`input2d.cylinder`, lines 106–114](../examples/IB/explicit/ex2/input2d.cylinder#L106-L114).
 
 ```text
 IBStandardInitializer {
@@ -127,6 +133,8 @@ Target points are used to impose prescribed motion on immersed boundary points; 
 
 The input chooses the parameters together:
 
+**Read:** [`input2d.cylinder`, lines 11–13](../examples/IB/explicit/ex2/input2d.cylinder#L11-L13) for grid spacing, [`input2d.cylinder`, line 27](../examples/IB/explicit/ex2/input2d.cylinder#L27) for `DT`, and [`input2d.cylinder`, lines 97–104](../examples/IB/explicit/ex2/input2d.cylinder#L97-L104) for the target-force parameters.
+
 ```text
 NFINEST = (REF_RATIO^(MAX_LEVELS - 1))*N
 DX_FINEST = L/NFINEST
@@ -142,6 +150,8 @@ E_s = 2.0*sqrt(K_s*M_s)
 Here `DX_FINEST = 0.125` and `DT = 0.0078125`. Both the IB and selected fluid integrator receive `dt_max = DT`. `M_s` is a grid-dependent effective mass used in this recipe for the penalty coefficients. `tau_s` supplies the decay scale in this parameter recipe. Keep these coupled expressions unchanged for this activity.
 
 The existing application registers the providers in the same way as the rubber-band example:
+
+**Read:** [`example.cpp`, lines 137–141](../examples/IB/explicit/ex2/example.cpp#L137-L141).
 
 ```cpp
 Pointer<IBStandardInitializer> ib_initializer = new IBStandardInitializer(
@@ -190,6 +200,8 @@ For example, `VelocityBcCoefs_0.gcoef_function_1` belongs to the **horizontal co
 
 The complete horizontal-component block is:
 
+**Read:** [`input2d.cylinder`, lines 43–61](../examples/IB/explicit/ex2/input2d.cylinder#L43-L61).
+
 ```text
 VelocityBcCoefs_0 {
    t_half = 0.5
@@ -212,6 +224,8 @@ VelocityBcCoefs_0 {
 The left face prescribes horizontal velocity using a smooth ramp, which we call $U_{\mathrm{in}}(t)$. It starts at zero and approaches one; `t_half` places the ramp's center and `tau` controls its transition scale. These constants belong to this coefficient database. The expression provider evaluates `t` at the time requested by the solver.
 
 The vertical-component block is:
+
+**Read:** [`input2d.cylinder`, lines 63–78](../examples/IB/explicit/ex2/input2d.cylinder#L63-L78).
 
 ```text
 VelocityBcCoefs_1 {
@@ -248,6 +262,8 @@ Internally, the staggered solver translates the normal-traction condition into i
 
 Find the boundary setup in `example.cpp`:
 
+**Read:** [`example.cpp`, lines 164–171](../examples/IB/explicit/ex2/example.cpp#L164-L171).
+
 ```cpp
 for (unsigned int d = 0; d < NDIM; ++d)
 {
@@ -279,6 +295,8 @@ The [coefficient-strategy reference](https://ibamr.github.io/IBAMR-docs/ibamr/cl
 ### Identify the force files
 
 The application also writes `C_D.curve` and `C_L.curve`, one row per completed time step. These contain the drag and lift forces, respectively, calculated as the negative sum of the structure's force components:
+
+**Read:** [`example.cpp`, lines 330–333](../examples/IB/explicit/ex2/example.cpp#L330-L333).
 
 ```cpp
 C_D_stream << loop_time << " " << -F[0] << endl;
@@ -341,11 +359,15 @@ cp cylinder/cylinder2d_128.spring cylinder-Re400/
 
 In `cylinder-Re400/input2d.cylinder`, change the top-level assignment from
 
+**Read:** [`input2d.cylinder`, line 3](../examples/IB/explicit/ex2/input2d.cylinder#L3).
+
 ```text
 Re = 200.0
 ```
 
 to
+
+**Replace in:** `cylinder-Re400/input2d.cylinder`, top-level `Re` ([`input2d.cylinder`, line 3](../examples/IB/explicit/ex2/input2d.cylinder#L3) in the supplied file).
 
 ```text
 Re = 400.0

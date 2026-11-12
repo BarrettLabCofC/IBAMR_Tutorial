@@ -8,6 +8,8 @@ Create a standalone rubber-band application that generates its points and spring
 
 Use the installed IBAMR environment from [tutorial 00](00-orientation.md), including `IBAMR_ROOT` and the matching compiler and MPI wrappers. Copy the starting files from the [rubber-band example](../examples/IB/explicit/ex1) using `EXAMPLES_SRC`. Your new project will have its own `CMakeLists.txt` and build directory outside the tutorial repository.
 
+Line numbers below refer to the supplied repository files before the edits in this tutorial. Use the named function or input block to find the same location after adding code.
+
 ## Create a standalone project
 
 Use a new directory outside the tutorial repository. The commands use `~/my-rubber-band`. If that directory already exists, choose another unused path for `BAND_SRC`.
@@ -20,6 +22,8 @@ cp "$EXAMPLES_SRC/examples/IB/explicit/ex1/"{example.cpp,input2d} "$BAND_SRC/"
 ```
 
 Create `$BAND_SRC/CMakeLists.txt` with the following contents.
+
+**New file:** `CMakeLists.txt`. Write the complete file below, starting at line 1.
 
 ```cmake
 cmake_minimum_required(VERSION 3.15)
@@ -42,6 +46,8 @@ target_link_libraries(my-rubber-band PRIVATE IBAMR::IBAMR2d)
 
 In `$BAND_SRC/input2d`, replace the whole `IBStandardInitializer { ... }` block, including its nested `curve2d_64` block, with:
 
+**Edit:** `input2d`. Replace the block copied from [`input2d`, lines 96–116](../examples/IB/explicit/ex1/input2d#L96-L116).
+
 ```text
 IBRedundantInitializer {
    max_levels = MAX_LEVELS
@@ -62,6 +68,8 @@ RubberBand {
 
 In `$BAND_SRC/example.cpp`, replace `#include <ibamr/IBStandardInitializer.h>` with `#include <ibamr/IBRedundantInitializer.h>`. Add the following headers above the comment `// Set up application namespace declarations`:
 
+**Edit:** `example.cpp`. The initializer include is originally at [`example.cpp`, line 30](../examples/IB/explicit/ex1/example.cpp#L30); insert the extra headers before the comment at [`example.cpp`, line 42](../examples/IB/explicit/ex1/example.cpp#L42).
+
 ```cpp
 #include <algorithm>
 #include <cmath>
@@ -70,6 +78,8 @@ In `$BAND_SRC/example.cpp`, replace `#include <ibamr/IBStandardInitializer.h>` w
 ```
 
 Insert this code after `#include <ibamr/app_namespaces.h>` and before `// Function prototypes`:
+
+**Add to:** `example.cpp`, between the namespace include and function prototypes copied from [`example.cpp`, lines 43–45](../examples/IB/explicit/ex1/example.cpp#L43-L45).
 
 ```cpp
 namespace
@@ -144,6 +154,8 @@ The stiffness uses the same `K/ds` scaling as the original input. Here `ds` is t
 
 In `main`, find the `// Configure the IB solver.` comment. Replace the construction of `IBStandardInitializer` and the following `registerLInitStrategy` call with this block. The existing `IBStandardForceGen` construction and registration follow it:
 
+**Replace in:** `example.cpp`, the initializer setup copied from [`example.cpp`, lines 146–148](../examples/IB/explicit/ex1/example.cpp#L146-L148) in `main`.
+
 ```cpp
 Pointer<Database> band_db = input_db->getDatabase("RubberBand");
 RubberBand band{ band_db->getInteger("num_points"),
@@ -212,7 +224,7 @@ mkdir less-stretched
 cp generated/input2d less-stretched/
 ```
 
-In `less-stretched/input2d`, change `beta = 0.35` to `beta = 0.30` in `RubberBand`. Run the same executable:
+In `$BAND_BUILD/less-stretched/input2d`, change `beta = 0.35` to `beta = 0.30` in the `RubberBand` block you added above. Run the same executable:
 
 ```bash
 cd "$BAND_BUILD/less-stretched"
@@ -237,6 +249,8 @@ The sign of the sum depends on the direction you walk around the curve. Taking i
 
 Add these headers to `$BAND_SRC/example.cpp` before `// Set up application namespace declarations`.
 
+**Add to:** `example.cpp`, before the namespace-declarations comment (originally [`example.cpp`, line 42](../examples/IB/explicit/ex1/example.cpp#L42)).
+
 ```cpp
 #include <fstream>
 #include <iomanip>
@@ -244,6 +258,8 @@ Add these headers to `$BAND_SRC/example.cpp` before `// Set up application names
 ```
 
 **Get the current positions.** After `generate_springs` and before the closing `} // namespace`, start `write_band_area` with the block below. Append each subsequent block in order to complete the function. The function receives the output stream, the structure's data manager and level, and the time for this measurement. `getLData("X", level)` retrieves the current positions. `getVec()` gives access to the PETSc vector that holds them across the MPI processes.
+
+**Add to:** `example.cpp`, after your `generate_springs` function and before its anonymous namespace closes.
 
 ```cpp
 void
@@ -255,6 +271,8 @@ write_band_area(std::ostream& output, LDataManager* manager, int level, double t
 
 **Put the coordinates in point order.** PETSc stores the coordinates by process ownership, so neighboring points along the band can be stored on different processes. `VecDuplicate` creates an empty vector with the same layout. `scatterPETScToLagrangian` fills it in the point order from `generate_points`. Then `scatterToZero` collects that ordered vector on rank zero. Every rank participates in both scatter calls. [PETSc scatter documentation](https://petsc.org/release/manualpages/Vec/VecScatterCreateToZero/)
 
+**Continue in:** `example.cpp`, appending to the `write_band_area` function started above.
+
 ```cpp
     Vec ordered;
     PetscCallAbort(PETSC_COMM_WORLD, VecDuplicate(distributed, &ordered));
@@ -265,6 +283,8 @@ write_band_area(std::ostream& output, LDataManager* manager, int level, double t
 ```
 
 **Sum the polygon contributions on rank zero.** Rank zero has all the coordinates. There are two values per point, with `xy[2*i]` holding $x_i$ and `xy[2*i + 1]` holding $y_i$. The loop takes the next point `j` and adds the term $x_i y_j-x_j y_i$ from the shoelace formula. The remainder operator connects the last point back to point zero.
+
+**Continue in:** `example.cpp`, appending to the `write_band_area` function started above.
 
 ```cpp
     if (IBTK_MPI::getRank() == 0)
@@ -285,6 +305,8 @@ write_band_area(std::ostream& output, LDataManager* manager, int level, double t
 
 **Write the area and release the temporary vectors.** Rank zero returns its read access to the coordinate array, then writes the time and half the absolute value of the sum. After the rank-zero block, every rank releases the two temporary vectors. The data manager owns the original position vector.
 
+**Continue in:** `example.cpp`, appending to the `write_band_area` function started above.
+
 ```cpp
         PetscCallAbort(PETSC_COMM_WORLD, VecRestoreArrayRead(gathered, &xy));
         output << time << ' ' << 0.5 * std::abs(twice_signed_area) << '\n';
@@ -297,6 +319,8 @@ write_band_area(std::ostream& output, LDataManager* manager, int level, double t
 ### Record the initial area and each completed step
 
 In `main`, insert this block immediately before `// Main time step loop.`, after the hierarchy has been initialized and `loop_time` has been set.
+
+**Add to:** `example.cpp`, before `// Main time step loop.` in `main` (originally [`example.cpp`, line 239](../examples/IB/explicit/ex1/example.cpp#L239)).
 
 ```cpp
 LDataManager* area_manager = ib_method_ops->getLDataManager();
@@ -316,6 +340,8 @@ write_band_area(area_output, area_manager, structure_level, loop_time);
 The file starts with a name for the curve, followed by two columns for physical time and area. Every process calls `write_band_area` so the coordinates can be collected, and rank zero opens and writes the file.
 
 Inside the time loop, add the same call immediately after `loop_time += dt;`.
+
+**Add to:** `example.cpp`, after `loop_time += dt;` in `main` (originally [`example.cpp`, line 254](../examples/IB/explicit/ex1/example.cpp#L254)).
 
 ```cpp
 write_band_area(area_output, area_manager, structure_level, loop_time);

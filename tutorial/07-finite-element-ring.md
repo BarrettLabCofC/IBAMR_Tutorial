@@ -154,7 +154,7 @@ $$
 
 The finite-element method uses its basis functions as test functions and assembles the force by integrating the stress against their gradients, together with the boundary term. This moves the spatial derivative from the stress to the test function.
 
-The example selects the partitioned implementation with `SPLIT_FORCES = TRUE`. IBAMR assembles the interior force through this weak form and spreads the boundary contribution $\mathbf T$ separately. The application supplies the stress callback, and IBAMR evaluates the required volume and boundary integrals. [Griffith and Luo, §2.1.2](https://pmc.ncbi.nlm.nih.gov/articles/PMC5650596/)
+The example selects the partitioned implementation with `SPLIT_FORCES = TRUE` in [`input2d`, line 23](../examples/IBFE/explicit/ex1/input2d#L23). IBAMR assembles the interior force through this weak form and spreads the boundary contribution $\mathbf T$ separately. The application supplies the stress callback, and IBAMR evaluates the required volume and boundary integrals. [Griffith and Luo, §2.1.2](https://pmc.ncbi.nlm.nih.gov/articles/PMC5650596/)
 
 ## The input and program
 
@@ -164,6 +164,8 @@ Read the supplied [application](../examples/IBFE/explicit/ex1/example.cpp) and [
 
 The input includes:
 
+**Read:** [`input2d`, lines 13–15](../examples/IBFE/explicit/ex1/input2d#L13-L15).
+
 ```text
 MFAC = 4.0
 ELEM_TYPE = "QUAD9"
@@ -171,6 +173,8 @@ CONVERGENCE_STUDY = FALSE
 ```
 
 `MFAC` sets a target element-spacing scale relative to the finest fluid cells. The application reads it and calculates:
+
+**Read:** [`example.cpp`, lines 171–173](../examples/IBFE/explicit/ex1/example.cpp#L171-L173).
 
 ```cpp
 const double dx = input_db->getDouble("DX");
@@ -180,12 +184,16 @@ const double ds = MFAC * dx;
 
 With these settings, `ds = 4/128 = 0.03125`. The source uses it to select the numbers of elements along and across a rectangular strip. Find these constants in the mesh-building section:
 
+**Read:** [`example.cpp`, lines 168–169](../examples/IBFE/explicit/ex1/example.cpp#L168-L169).
+
 ```cpp
 const double R = 0.25;
 const double w = 0.0625;
 ```
 
 The rectangle has length `2*pi*R` and width `w`. With `CONVERGENCE_STUDY = FALSE`, the `n_x` and `n_y` expressions use `ceil(2.0*M_PI*R/ds)` and `ceil(w/ds)`, giving 51 by 2 elements. The mesh-generation call is:
+
+**Read:** [`example.cpp`, lines 179–180](../examples/IBFE/explicit/ex1/example.cpp#L179-L180).
 
 ```cpp
 MeshTools::Generation::build_square(
@@ -195,6 +203,8 @@ MeshTools::Generation::build_square(
 The arguments supply the mesh, element counts, coordinate limits in each direction, and element type. `QUAD9` selects a quadrilateral with nine nodes: four corners, four edge midpoints, and a center. Those nodes support a quadratic approximation of the fields within each element. The mesh contains 102 elements through which IBAMR evaluates the structural stress.
 
 The rectangle's coordinates, called `s` in the mapping function, label the material. The two short ends will meet when the rectangle wraps into a ring. The application connects them with a libMesh periodic constraint:
+
+**Read:** [`example.cpp`, lines 181–184](../examples/IBFE/explicit/ex1/example.cpp#L181-L184).
 
 ```cpp
 VectorValue<double> boundary_translation(2.0 * M_PI * R, 0.0, 0.0);
@@ -209,6 +219,8 @@ The translation connects the left and right edges of this generated rectangle. T
 
 Near the top of `example.cpp`, `ModelData` defines:
 
+**Read:** [`example.cpp`, lines 56–59](../examples/IBFE/explicit/ex1/example.cpp#L56-L59).
+
 ```cpp
 static const double R = 0.25;
 static const double w = 0.0625;
@@ -217,6 +229,8 @@ static const double mu = 1.0;
 ```
 
 These values belong to the structural model. The coordinate mapping uses `R` and `gamma`:
+
+**Read:** [`example.cpp`, lines 62–68](../examples/IBFE/explicit/ex1/example.cpp#L62-L68).
 
 ```cpp
 void
@@ -244,6 +258,8 @@ $$
 
 describes how small material directions map into the current physical configuration. In this example, the stress function receives that gradient as `FF` and fills the result `PP`:
 
+**Read:** [`example.cpp`, lines 72–90](../examples/IBFE/explicit/ex1/example.cpp#L72-L90).
+
 ```cpp
 void
 PK1_stress_function(TensorValue<double>& PP,
@@ -266,7 +282,7 @@ PK1_stress_function(TensorValue<double>& PP,
 }
 ```
 
-The input selects `SMOOTH_CASE = FALSE`, which selects the **neo-Hookean law** of the thick-ring benchmark.
+The input selects `SMOOTH_CASE = FALSE` at [`input2d`, line 19](../examples/IBFE/explicit/ex1/input2d#L19), which selects the **neo-Hookean law** of the thick-ring benchmark.
 
 The elastic strain energy per unit reference volume is
 
@@ -290,6 +306,8 @@ IBAMR evaluates the stress at integration points within the elements and assembl
 
 The application constructs its IB strategy with the mesh:
 
+**Read:** [`example.cpp`, lines 211–218](../examples/IBFE/explicit/ex1/example.cpp#L211-L218).
+
 ```cpp
 Pointer<IBFEMethod> ib_method_ops =
     new IBFEMethod("IBFEMethod",
@@ -303,6 +321,8 @@ Pointer<IBFEMethod> ib_method_ops =
 
 The constructor receives its name, input settings, mesh pointer, permitted fluid-level count, and restart settings. Its database configures the coupling. The input sets `IB_DELTA_FUNCTION = "IB_4"` and `IB_POINT_DENSITY = 2.0`, then supplies them through:
 
+**Read:** [`input2d`, lines 100–104](../examples/IBFE/explicit/ex1/input2d#L100-L104) in `IBFEMethod` (selected entries).
+
 ```text
 IB_delta_fcn = IB_DELTA_FUNCTION
 IB_point_density = IB_POINT_DENSITY
@@ -311,6 +331,8 @@ IB_point_density = IB_POINT_DENSITY
 The first selects the same four-point kernel used earlier. The second controls the approximate density of integration points used to exchange force and velocity with the fluid grid. These interaction points are placed within the elements, allowing the finite-element mesh and the fluid coupling to use different spacing scales.
 
 As in the rubber-band application, the coupled driver receives the IB strategy and fluid integrator:
+
+**Read:** [`example.cpp`, lines 219–223](../examples/IBFE/explicit/ex1/example.cpp#L219-L223).
 
 ```cpp
 Pointer<IBHierarchyIntegrator> time_integrator =
@@ -321,6 +343,8 @@ Pointer<IBHierarchyIntegrator> time_integrator =
 ```
 
 Next, the application creates the finite-element systems and registers the model functions:
+
+**Read:** [`example.cpp`, lines 242–245](../examples/IBFE/explicit/ex1/example.cpp#L242-L245).
 
 ```cpp
 ib_method_ops->initializeFEEquationSystems();
@@ -336,6 +360,8 @@ For the public interfaces, see the [`IBFEMethod` documentation](https://ibamr.gi
 ### Initialize the fields and advance them
 
 Before initializing the finite-element fields, the application adds the material seam constraint to each system:
+
+**Read:** [`example.cpp`, lines 345–353](../examples/IBFE/explicit/ex1/example.cpp#L345-L353).
 
 ```cpp
 EquationSystems* equation_systems = ib_method_ops->getFEDataManager()->getEquationSystems();
@@ -357,6 +383,8 @@ The existing time loop calls `time_integrator->advanceHierarchy(dt)`. The couple
 
 The input selects two writers:
 
+**Read:** [`input2d`, lines 163–165](../examples/IBFE/explicit/ex1/input2d#L163-L165).
+
 ```text
 viz_writer = "VisIt","ExodusII"
 viz_dump_interval = 16
@@ -365,11 +393,15 @@ viz_dump_dirname = "viz_IB2d"
 
 The VisIt writer saves the fluid hierarchy. The structure writer is constructed from the material mesh:
 
+**Read:** [`example.cpp`, line 328](../examples/IBFE/explicit/ex1/example.cpp#L328).
+
 ```cpp
 std::unique_ptr<ExodusII_IO> exodus_io = uses_exodus ? std::make_unique<ExodusII_IO>(mesh) : nullptr;
 ```
 
 At each saved state, the application writes the finite-element systems and physical time:
+
+**Read:** [`example.cpp`, lines 376–377](../examples/IBFE/explicit/ex1/example.cpp#L376-L377).
 
 ```cpp
 exodus_io->write_timestep(
@@ -378,7 +410,7 @@ exodus_io->write_timestep(
 
 `exodus_filename` comes from `AppInitializer`; here it is `viz_IB2d/output.ex2`. The systems contain the evolving `X_0` and `X_1` coordinates used in the Displace expression. The fluid writer receives the same `loop_time`, allowing the Time correlation to match the two outputs.
 
-This application also registers a postprocessor that interpolates current fluid pressure onto the finite-element mesh under the name `p_f`. That field is fluid pressure sampled on the material; `P` in `dumps.visit` is the fluid-grid field used in the figures above.
+In [`example.cpp`, lines 248–272](../examples/IBFE/explicit/ex1/example.cpp#L248-L272), the application registers a postprocessor that interpolates current fluid pressure onto the finite-element mesh under the name `p_f`. That field is fluid pressure sampled on the material; `P` in `dumps.visit` is the fluid-grid field used in the figures above.
 
 ## Further exploration: inspect the structure's volume history
 
@@ -391,7 +423,7 @@ tail -n 3 "$EXAMPLES_BUILD/examples/IBFE/explicit/ex1/elastic-ring/volume.curve"
 
 The checked run gives `0.139900272879` after the first step, at time `0.001953125`, and `0.139055052048` at the final time. The file starts after the first completed step. These values give another way to inspect the moving structure alongside its width and height.
 
-In the source's final processing loop, `jacobian(FF, ...)` evaluates the coordinate gradient at element integration points. The code accumulates `abs(FF.det()) * JxW[qp]`, where `JxW` contains the material-mesh integration weights, then combines contributions across processes with `IBTK_MPI::sumReduction`. The determinant converts material-coordinate area into current physical area. This integral covers the ring material between its inner and outer boundaries.
+In the processing loop at [`example.cpp`, lines 455–492](../examples/IBFE/explicit/ex1/example.cpp#L455-L492), `jacobian(FF, ...)` evaluates the coordinate gradient at element integration points. The code accumulates `abs(FF.det()) * JxW[qp]`, where `JxW` contains the material-mesh integration weights, then combines contributions across processes with `IBTK_MPI::sumReduction`. The determinant converts material-coordinate area into current physical area. This integral covers the ring material between its inner and outer boundaries.
 
 ## Before moving on
 

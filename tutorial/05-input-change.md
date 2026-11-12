@@ -24,11 +24,15 @@ cp elastic-loop/curve2d_64.spring elastic-loop-stiff/
 
 If that new directory already exists, choose a fresh name and use it consistently below. Open `elastic-loop-stiff/input2d` and change only
 
+**Read:** [`input2d`, line 8](../examples/IB/explicit/ex1/input2d#L8).
+
 ```text
 K   = 1.0
 ```
 
 to
+
+**Replacement in:** `elastic-loop-stiff/input2d`, top-level `K` ([`input2d`, line 8](../examples/IB/explicit/ex1/input2d#L8) in the supplied file).
 
 ```text
 K   = 2.0
@@ -90,15 +94,21 @@ Save the measurements alongside each run's input and log, including `K` and phys
 
 ## The input and program
 
+The application source and supplied input are in `examples/IB/explicit/ex1` under `EXAMPLES_SRC`.
+
 ### Follow the active stiffness setting
 
 Open the baseline run's `input2d` under `EXAMPLES_BUILD/examples/IB/explicit/ex1/elastic-loop`. Find the top-level parameter:
+
+**Read:** [`input2d`, line 8](../examples/IB/explicit/ex1/input2d#L8).
 
 ```text
 K   = 1.0
 ```
 
 Inside `IBStandardInitializer`, find the structure's settings:
+
+**Read:** [`input2d`, lines 112–115](../examples/IB/explicit/ex1/input2d#L112-L115).
 
 ```text
 curve2d_64 {
@@ -119,6 +129,8 @@ Doubling `K` therefore doubles the coefficient assigned to every spring. The `.s
 
 Follow the setup in the supplied [application](../examples/IB/explicit/ex1/example.cpp). The relevant connection is:
 
+**Read:** [`example.cpp`, lines 146–148](../examples/IB/explicit/ex1/example.cpp#L146-L148).
+
 ```cpp
 Pointer<IBStandardInitializer> ib_initializer = new IBStandardInitializer(
     "IBStandardInitializer", app_initializer->getComponentDatabase("IBStandardInitializer"));
@@ -128,6 +140,8 @@ ib_method_ops->registerLInitStrategy(ib_initializer);
 The constructor receives the initializer's input block. Registering the initializer with `IBMethod` starts its setup, including reading the structure files. For each spring, the initializer reads the file's parameters and replaces the stiffness with the input override. This happens when a new run starts; the executable does not contain a hard-coded value of `K`.
 
 The force generator registered just below these lines uses those initialized parameters during advancement. To see how stiffness enters its calculation, the default spring function is defined in the installed header `$IBAMR_ROOT/include/ibamr/IBSpringForceFunctions.h`:
+
+**Library header:** `$IBAMR_ROOT/include/ibamr/IBSpringForceFunctions.h`, lines 103–107 in v0.19.0 ([versioned source](https://github.com/IBAMR/IBAMR/blob/v0.19.0/include/ibamr/IBSpringForceFunctions.h#L103)).
 
 ```cpp
 inline double
@@ -147,11 +161,15 @@ For more detail, see the [`IBStandardInitializer` documentation](https://ibamr.g
 
 The same input uses `K` in its time-step bound:
 
+**Read:** [`input2d`, line 29](../examples/IB/explicit/ex1/input2d#L29).
+
 ```text
 DT = (1.0/K)*1.6e-2*DX_FINEST
 ```
 
 Both `IBHierarchyIntegrator` and the selected `INSStaggeredHierarchyIntegrator` receive it through:
+
+**Read:** [`input2d`, line 85](../examples/IB/explicit/ex1/input2d#L85) in `IBHierarchyIntegrator` and [`input2d`, line 154](../examples/IB/explicit/ex1/input2d#L154) in `INSStaggeredHierarchyIntegrator`.
 
 ```text
 dt_max = DT
@@ -160,6 +178,8 @@ dt_max = DT
 For the existing grid, `DX_FINEST = 1/64`. Changing `K` from `1.0` to `2.0` changes `DT` from `0.00025` to `0.000125`. Keep this expression: it supplies the smaller step chosen by this example for a stiffer structure. This is an example-specific step bound, not a general stability formula for other models.
 
 Keep the final time independent of `K`:
+
+**Read:** [`input2d`, line 21](../examples/IB/explicit/ex1/input2d#L21).
 
 ```text
 END_TIME = 0.6

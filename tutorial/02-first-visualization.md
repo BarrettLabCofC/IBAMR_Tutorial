@@ -6,7 +6,7 @@ Open the two runs from tutorial 01 in VisIt, select fields and saved times, and 
 
 ## Before you start
 
-Finish both runs in [tutorial 01](01-first-run.md). Use VisIt with its SAMRAI reader available.
+Finish both runs in [tutorial 01](01-first-run.md). Use VisIt with its SAMRAI reader available. This tutorial uses the fluid example in `examples/navier_stokes/ex1`.
 
 Open `examples/navier_stokes/ex1/first-flow/viz_INS2d/dumps.visit` under `EXAMPLES_BUILD`, the example repository's build directory.
 
@@ -107,6 +107,8 @@ If `Omega` is absent, check that you opened the fluid `dumps.visit` from the int
 
 Open the supplied [fluid application](../examples/navier_stokes/ex1/example.cpp) and [input](../examples/navier_stokes/ex1/input2d). Follow these excerpts in place; no C++ change is needed. The run copy from tutorial 01 uses these entries within `Main`:
 
+**Run input:** `first-flow/input2d`, `Main`; see [`input2d`, lines 105–107](../examples/navier_stokes/ex1/input2d#L105-L107). Tutorial 01 changes the interval to `10`.
+
 ```text
 viz_writer = "VisIt"
 viz_dump_interval = 10
@@ -115,6 +117,8 @@ viz_dump_dirname = "viz_INS2d"
 
 The writer name selects the output system, the interval selects how often to save completed steps, and the directory name locates the saved files relative to the run directory. The fields are selected separately. At the top of the input, find:
 
+**Read:** [`input2d`, lines 27–30](../examples/navier_stokes/ex1/input2d#L27-L30).
+
 ```text
 OUTPUT_U = TRUE
 OUTPUT_P = TRUE
@@ -122,6 +126,8 @@ OUTPUT_OMEGA = TRUE
 ```
 
 Inside the selected `INSStaggeredHierarchyIntegrator` block, those constants feed:
+
+**Read:** [`input2d`, lines 89–92](../examples/navier_stokes/ex1/input2d#L89-L92) in `INSStaggeredHierarchyIntegrator`.
 
 ```text
 output_U = OUTPUT_U
@@ -135,6 +141,8 @@ These flags request velocity `U`, pressure `P`, and vorticity `Omega`. A directo
 
 Near the beginning of `main`, the application reads:
 
+**Read:** [`example.cpp`, lines 72–74](../examples/navier_stokes/ex1/example.cpp#L72-L74).
+
 ```cpp
 const bool dump_viz_data = app_initializer->dumpVizData();
 const int viz_dump_interval = app_initializer->getVizDumpInterval();
@@ -142,6 +150,8 @@ const bool uses_visit = dump_viz_data && app_initializer->getVisItDataWriter();
 ```
 
 `dump_viz_data` records whether visualization output is enabled, and `viz_dump_interval` supplies the loop's saving interval. `uses_visit` also checks that a VisIt writer is available. Later, before hierarchy initialization, find:
+
+**Read:** [`example.cpp`, lines 168–172](../examples/navier_stokes/ex1/example.cpp#L168-L172).
 
 ```cpp
 Pointer<VisItDataWriter<NDIM>> visit_data_writer = app_initializer->getVisItDataWriter();
@@ -157,12 +167,16 @@ The initializer supplies the configured writer. Registration lets the integrator
 
 After hierarchy initialization and before the time loop, the application obtains the step and physical time:
 
+**Read:** [`example.cpp`, lines 185–186](../examples/navier_stokes/ex1/example.cpp#L185-L186).
+
 ```cpp
 int iteration_num = time_integrator->getIntegratorStep();
 double loop_time = time_integrator->getIntegratorTime();
 ```
 
 Inside the following visualization block it calls:
+
+**Read:** [`example.cpp`, lines 190–191](../examples/navier_stokes/ex1/example.cpp#L190-L191).
 
 ```cpp
 time_integrator->setupPlotData();
@@ -173,12 +187,16 @@ visit_data_writer->writePlotData(patch_hierarchy, iteration_num, loop_time);
 
 Inside the time loop, after advancement, the application increments the step counter and tests:
 
+**Read:** [`example.cpp`, lines 220–221](../examples/navier_stokes/ex1/example.cpp#L220-L221).
+
 ```cpp
 iteration_num += 1;
 const bool last_step = !time_integrator->stepsRemaining();
 ```
 
 The output condition is:
+
+**Read:** [`example.cpp`, line 222](../examples/navier_stokes/ex1/example.cpp#L222).
 
 ```cpp
 if (dump_viz_data && uses_visit && (iteration_num % viz_dump_interval == 0 || last_step))

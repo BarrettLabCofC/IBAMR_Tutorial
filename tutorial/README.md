@@ -21,6 +21,8 @@ Follow the tutorials in order. Tutorials 00–11 cover the fundamentals; tutoria
 
 Begin with [tutorial 00](00-orientation.md), using a terminal opened at the repository's top level. The tutorials define `EXAMPLES_SRC` for this repository, `EXAMPLES_BUILD` for its build directory, and `IBAMR_ROOT` for the installed library. Keep those variables set as you work through the tutorials.
 
+Code walkthroughs name the source or input file and give line numbers for the current supplied files. Links open those locations when viewed on GitHub. After making edits, use the named function or input block to locate code whose line numbers have shifted. Paths beginning with `examples/` are relative to `EXAMPLES_SRC`; run copies are under `EXAMPLES_BUILD`.
+
 The current examples and figures have been checked with IBAMR v0.19.0.
 
 Return to the [repository overview](../README.md) for requirements and layout.

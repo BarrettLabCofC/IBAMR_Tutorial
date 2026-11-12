@@ -27,14 +27,14 @@ cp "$EXAMPLES_SRC/examples/navier_stokes/ex1/input2d" first-flow/
 cd first-flow
 ```
 
-Open this run directory's `input2d` in your editor. Make the following four changes for a short, single-level run. Keep the other settings unchanged.
+Open `$EXAMPLES_BUILD/examples/navier_stokes/ex1/first-flow/input2d` in your editor. The table gives each setting's line in the supplied [`input2d`, lines 1–120](../examples/navier_stokes/ex1/input2d#L1-L120). Make the following four changes for a short, single-level run.
 
-| Setting | Supplied value | Value for this run |
-| --- | --- | --- |
-| `MAX_LEVELS` | `3` | `1` |
-| `N` | `16` | `64` |
-| `END_TIME` | `2.0` | `1.0` |
-| `Main.viz_dump_interval` | `NFINEST/8` | `10` |
+| Setting | Line | Supplied value | Value for this run |
+| --- | --- | --- | --- |
+| `MAX_LEVELS` | 7 | `3` | `1` |
+| `N` | 9 | `16` | `64` |
+| `END_TIME` | 17 | `2.0` | `1.0` |
+| `Main.viz_dump_interval` | 106 | `NFINEST/8` | `10` |
 
 `Main.viz_dump_interval` means the `viz_dump_interval` entry inside the `Main` block. Save the input, then run from the same `first-flow` directory:
 
@@ -70,11 +70,15 @@ cp first-flow/input2d first-flow-viscous/
 
 Open `first-flow-viscous/input2d` in the example's build directory. Change only the top-level viscosity assignment from
 
+**Run input:** `first-flow-viscous/input2d`; viscosity is at [`input2d`, line 2](../examples/navier_stokes/ex1/input2d#L2) in the supplied file.
+
 ```text
 MU  = 0.0001
 ```
 
 to
+
+**Replacement in the same run input:** change the viscosity entry identified above.
 
 ```text
 MU  = 0.001

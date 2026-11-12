@@ -22,6 +22,8 @@ cd restart-tutorial/checkpoint
 
 In this copy of `input2d`, find the two restart settings inside `Main`. Set the interval to `1200` and keep the directory name shown here.
 
+**Edit:** `restart-tutorial/checkpoint/input2d`, inside `Main`. The supplied entries are at [`input2d`, lines 180–181](../examples/IB/explicit/ex1/input2d#L180-L181).
+
 ```text
 restart_dump_interval = 1200
 restart_dump_dirname = "restart_IB2d"
@@ -97,6 +99,8 @@ The plots should show the same shape and pressure pattern. Use a tolerance of ab
 
 In the [rubber-band source](../examples/IB/explicit/ex1/example.cpp), the time loop advances the hierarchy and increments the step number before checking the restart interval. It uses the completed step number to label the checkpoint.
 
+**Read:** [`example.cpp`, lines 274–278](../examples/IB/explicit/ex1/example.cpp#L274-L278).
+
 ```cpp
 if (dump_restart_data && (iteration_num % restart_dump_interval == 0 || last_step))
 {
@@ -111,7 +115,7 @@ The checkpoint and the visualization files serve different purposes. Use `restar
 
 ### Finite-element checkpoints
 
-The [finite-element ring application](../examples/IBFE/explicit/ex1/example.cpp) also calls `writeFEDataToRestartFile` to save libMesh equation-system data alongside the SAMRAI checkpoint. At startup the application passes the restart directory and saved step to `IBFEMethod`, which uses those files to restore the finite-element state. Keep the `libmesh_data_...` files in the checkpoint directory along with the `restore.*` directories.
+The finite-element ring application at [`example.cpp`, lines 430–436](../examples/IBFE/explicit/ex1/example.cpp#L430-L436) also calls `writeFEDataToRestartFile` to save libMesh equation-system data alongside the SAMRAI checkpoint. At startup, its `IBFEMethod` constructor in [`example.cpp`, lines 211–218](../examples/IBFE/explicit/ex1/example.cpp#L211-L218) receives the restart directory and saved step to restore the finite-element state. Keep the `libmesh_data_...` files in the checkpoint directory along with the `restore.*` directories.
 
 ## Before moving on
 

@@ -8,6 +8,8 @@ Follow the setup and time loop of the fluid application you have already run and
 
 Complete [tutorial 02](02-first-visualization.md), using the baseline and higher-viscosity runs from tutorial 01. Keep `EXAMPLES_SRC` and `EXAMPLES_BUILD` set in your terminal. Source changes go in `examples/navier_stokes/ex1` under the source directory; the new executable and run files go in the corresponding build directory.
 
+Line numbers below refer to the supplied repository files before the edits in this tutorial. Use the named function or input block to find the same location after adding code.
+
 ## Start with the existing result
 
 Use the completed fluid run from tutorial 01 as the starting example. Before editing its source, check the output in the build directory:
@@ -28,11 +30,15 @@ The flow you ran in tutorial 01 and viewed in tutorial 02 now provides a concret
 
 In the supplied `input2d`, find `L` near the top:
 
+**Read:** [`input2d`, line 4](../examples/navier_stokes/ex1/input2d#L4).
+
 ```text
 L = 1.0
 ```
 
 The tutorial 01 run uses `N = 64` cells per direction. Find the domain geometry block:
+
+**Read:** [`input2d`, lines 122–127](../examples/navier_stokes/ex1/input2d#L122-L127).
 
 ```text
 CartesianGeometry {
@@ -46,6 +52,8 @@ CartesianGeometry {
 `x_lo` and `x_up` set the physical bounds. With `L = 1.0`, the domain is the square $0\leq x,y\leq1$. `domain_boxes` gives the grid-index bounds, here `N` cells in each direction. The two entries in `periodic_dimension` enable periodicity in $x$ and $y$: material leaving one side re-enters through the opposite side. These settings give periodic boundaries rather than walls, an inlet, or an outlet.
 
 The horizontal velocity changes direction across thin layers near $y=0.25$ and $y=0.75$. A small vertical disturbance starts their motion away from a perfectly straight arrangement. Find this block in the supplied `input2d`:
+
+**Read:** [`input2d`, lines 38–43](../examples/navier_stokes/ex1/input2d#L38-L43).
 
 ```text
 VelocityInitialConditions {
@@ -66,6 +74,8 @@ The input selects `SOLVER_TYPE = "STAGGERED"`. The application constructs `INSSt
 
 Inside the `STAGGERED` branch, find:
 
+**Read:** [`example.cpp`, lines 95–97](../examples/navier_stokes/ex1/example.cpp#L95-L97).
+
 ```cpp
 time_integrator = new INSStaggeredHierarchyIntegrator(
     "INSStaggeredHierarchyIntegrator",
@@ -78,6 +88,8 @@ The constructor configures the integrator before the hierarchy exists. It does n
 
 The relevant top-level assignments are:
 
+**Read:** [`input2d`, lines 3–20](../examples/navier_stokes/ex1/input2d#L3-L20).
+
 ```text
 RHO = 1.0
 CFL_MAX = 0.3
@@ -86,6 +98,8 @@ CONVECTIVE_TS_TYPE = "ADAMS_BASHFORTH"
 ```
 
 Inside `INSStaggeredHierarchyIntegrator`, find the corresponding entries:
+
+**Read:** [`input2d`, lines 73–84](../examples/navier_stokes/ex1/input2d#L73-L84) in `INSStaggeredHierarchyIntegrator` (selected entries).
 
 ```text
 mu = MU
@@ -99,6 +113,8 @@ The selected block receives `mu = MU`, `rho = RHO`, and the time settings. `CFL_
 
 The default is defined in IBAMR’s `INSHierarchyIntegrator.h` (installed under `$IBAMR_ROOT/include/ibamr`):
 
+**Library header:** `$IBAMR_ROOT/include/ibamr/INSHierarchyIntegrator.h`, line 494 in v0.19.0 ([versioned source](https://github.com/IBAMR/IBAMR/blob/v0.19.0/include/ibamr/INSHierarchyIntegrator.h#L494)).
+
 ```cpp
 TimeSteppingType d_viscous_time_stepping_type = TRAPEZOIDAL_RULE;
 ```
@@ -106,6 +122,8 @@ TimeSteppingType d_viscous_time_stepping_type = TRAPEZOIDAL_RULE;
 ### Supply the initial field, then initialize it
 
 Find the initial-condition setup:
+
+**Read:** [`example.cpp`, lines 130–132](../examples/navier_stokes/ex1/example.cpp#L130-L132).
 
 ```cpp
 Pointer<CartGridFunction> u_init = new muParserCartGridFunction(
@@ -125,6 +143,8 @@ The solver works over a `PatchHierarchy`: grid cells grouped into rectangular pa
 
 The geometry and hierarchy are connected explicitly:
 
+**Read:** [`example.cpp`, lines 110–112](../examples/navier_stokes/ex1/example.cpp#L110-L112).
+
 ```cpp
 Pointer<CartesianGridGeometry<NDIM>> grid_geometry = new CartesianGridGeometry<NDIM>(
     "CartesianGeometry", app_initializer->getComponentDatabase("CartesianGeometry"));
@@ -133,7 +153,7 @@ Pointer<PatchHierarchy<NDIM>> patch_hierarchy = new PatchHierarchy<NDIM>("PatchH
 
 The geometry reads physical bounds and periodic directions from its database. The hierarchy receives that geometry and will hold the levels, patches, and numerical data created during initialization. Constructing these objects establishes their relationship; the later initialization call builds the actual grid and fills the initial fields.
 
-Follow the remaining grid helpers through the setup in `example.cpp`:
+Follow the remaining grid helpers in [`example.cpp`, lines 113–125](../examples/navier_stokes/ex1/example.cpp#L113-L125):
 
 | Object | What this application asks it to do |
 | --- | --- |
@@ -145,6 +165,8 @@ Follow the remaining grid helpers through the setup in `example.cpp`:
 | `GriddingAlgorithm` | Assemble the hierarchy using those helpers and the grid input |
 
 `StandardTagAndInitialize` receives `time_integrator`, which lets grid creation ask the solver how to initialize data and identify cells for refinement. The `GriddingAlgorithm` then receives the input block and the three helpers:
+
+**Read:** [`example.cpp`, lines 120–125](../examples/navier_stokes/ex1/example.cpp#L120-L125).
 
 ```cpp
 Pointer<GriddingAlgorithm<NDIM>> gridding_algorithm =
@@ -159,6 +181,8 @@ The arguments keep separate responsibilities together: `error_detector` connects
 
 The application connects the hierarchy and gridding algorithm with:
 
+**Read:** [`example.cpp`, line 175](../examples/navier_stokes/ex1/example.cpp#L175).
+
 ```cpp
 time_integrator->initializePatchHierarchy(patch_hierarchy, gridding_algorithm);
 ```
@@ -170,6 +194,8 @@ Our one-level run still uses this infrastructure, but creates no finer levels. `
 `periodic_dimension = 1,1` specifies the two periodic directions. The application recognizes this geometry and does not register physical-boundary coefficient objects for these directions. A later cylinder tutorial introduces actual inlet/outlet coefficients and their meanings.
 
 Now find these lines inside the time loop:
+
+**Read:** [`example.cpp`, lines 199–209](../examples/navier_stokes/ex1/example.cpp#L199-L209).
 
 ```cpp
 iteration_num = time_integrator->getIntegratorStep();
@@ -183,7 +209,7 @@ The first two calls read the current step and physical time. The application the
 
 The application's `while` condition checks the end time and `stepsRemaining()`. The numerical work stays inside the integrator, while this outer loop handles progress messages and decides when to save data. For an IB application, an IB hierarchy integrator will occupy this coordinating role and receive both a fluid integrator and a structure strategy.
 
-Trace `END_TIME` through the input's `end_time` entry, then locate `getEndTime()` in the application. This shows where the application reads the integrator's stopping time; `advanceHierarchy(dt)` performs the actual update of the fields.
+Trace `END_TIME` at [`input2d`, line 17](../examples/navier_stokes/ex1/input2d#L17) through `INSStaggeredHierarchyIntegrator.end_time` at [`input2d`, line 76](../examples/navier_stokes/ex1/input2d#L76), then locate `getEndTime()` in [`example.cpp`, line 195](../examples/navier_stokes/ex1/example.cpp#L195). This shows where the application reads the integrator's stopping time; `advanceHierarchy(dt)` performs the actual update of the fields.
 
 ## The input and program
 
@@ -198,6 +224,8 @@ E(t)=\frac{\rho}{2}\int_\Omega\left(u_x^2+u_y^2\right)\,dA.
 $$
 
 This is kinetic energy per unit depth. The density comes from the same input entry used by the fluid solver:
+
+**Read:** [`input2d`, line 3](../examples/navier_stokes/ex1/input2d#L3).
 
 ```text
 RHO = 1.0
@@ -216,6 +244,8 @@ cp example.cpp kinetic_energy.cpp
 
 Make the following changes in `kinetic_energy.cpp`. Add these headers beside the existing includes, before `app_namespaces.h`:
 
+**Edit `kinetic_energy.cpp`:** Add headers before `app_namespaces.h`. Original location: [`example.cpp`, lines 36–37](../examples/navier_stokes/ex1/example.cpp#L36-L37).
+
 ```cpp
 #include <Patch.h>
 #include <PatchLevel.h>
@@ -229,6 +259,8 @@ The patch and side-data headers provide the types used in the loops. `HierarchyM
 
 Add this declaration beside the existing function prototypes, before `main`:
 
+**Edit `kinetic_energy.cpp`:** Add the prototype beside `output_data`. Original location: [`example.cpp`, lines 39–44](../examples/navier_stokes/ex1/example.cpp#L39-L44).
+
 ```cpp
 double compute_kinetic_energy_manual(Pointer<PatchHierarchy<NDIM>> patch_hierarchy,
                                      Pointer<INSHierarchyIntegrator> ins_integrator,
@@ -240,6 +272,8 @@ The function receives the hierarchy containing the grid, the fluid integrator id
 ### Retrieve the patch data and accumulate energy
 
 Add the complete function at the end of the file, after the existing `output_data` function:
+
+**Edit `kinetic_energy.cpp`:** Append the function after `output_data`. Original location: [`example.cpp`, lines 251–276](../examples/navier_stokes/ex1/example.cpp#L251-L276).
 
 ```cpp
 double
@@ -296,11 +330,15 @@ The loops accumulate this process's contribution. `IBTK_MPI::sumReduction` adds 
 
 In `main`, immediately after the line that gets `input_db`, read the density:
 
+**Edit `kinetic_energy.cpp`:** In `main`, add after the `input_db` declaration. Original location: [`example.cpp`, line 69](../examples/navier_stokes/ex1/example.cpp#L69).
+
 ```cpp
 const double rho = input_db->getDouble("RHO");
 ```
 
 After the declaration of `solver_type`, before the solver-selection `if` statement, add this check for the layout used by the function:
+
+**Edit `kinetic_energy.cpp`:** In `main`, insert after the `solver_type` declaration and before its `if`. Original location: [`example.cpp`, lines 91–93](../examples/navier_stokes/ex1/example.cpp#L91-L93).
 
 ```cpp
 if (solver_type != "STAGGERED")
@@ -311,12 +349,16 @@ if (solver_type != "STAGGERED")
 
 Find `// Main time step loop.`. Immediately before that comment, add:
 
+**Edit `kinetic_energy.cpp`:** In `main`, add before `// Main time step loop.`. Original location: [`example.cpp`, line 194](../examples/navier_stokes/ex1/example.cpp#L194).
+
 ```cpp
 const double initial_manual_energy = compute_kinetic_energy_manual(patch_hierarchy, time_integrator, rho);
 pout << "KINETIC_ENERGY_MANUAL " << loop_time << " " << std::setprecision(17) << initial_manual_energy << "\n";
 ```
 
 The hierarchy and initial velocity have been initialized at this point. Inside the time loop, immediately after `loop_time += dt;`, add:
+
+**Edit `kinetic_energy.cpp`:** In `main`, add after `loop_time += dt;`. Original location: [`example.cpp`, line 209](../examples/navier_stokes/ex1/example.cpp#L209).
 
 ```cpp
 const double manual_energy = compute_kinetic_energy_manual(patch_hierarchy, time_integrator, rho);
@@ -328,6 +370,8 @@ The preceding `advanceHierarchy(dt)` call has completed the step, so the current
 ## Running the example
 
 Append this block to `examples/navier_stokes/ex1/CMakeLists.txt` in the source directory:
+
+**Edit:** append to `CMakeLists.txt` after its existing target ([`CMakeLists.txt`, lines 1–3](../examples/navier_stokes/ex1/CMakeLists.txt#L1-L3)).
 
 ```cmake
 add_executable(navier_stokes-ex1-energy-2d kinetic_energy.cpp)
@@ -394,11 +438,15 @@ Use these method descriptions to check which data indices an operation expects a
 
 Add the side-operations header before `app_namespaces.h`:
 
+**Edit `kinetic_energy.cpp`:** Add the header before `app_namespaces.h`. Original location: [`example.cpp`, lines 36–37](../examples/navier_stokes/ex1/example.cpp#L36-L37).
+
 ```cpp
 #include <HierarchySideDataOpsReal.h>
 ```
 
 Add this declaration beside the manual function's prototype:
+
+**Edit `kinetic_energy.cpp`:** Add the prototype beside the manual-energy prototype. Original location: [`example.cpp`, lines 39–44](../examples/navier_stokes/ex1/example.cpp#L39-L44).
 
 ```cpp
 double compute_kinetic_energy(Pointer<PatchHierarchy<NDIM>> patch_hierarchy,
@@ -407,6 +455,8 @@ double compute_kinetic_energy(Pointer<PatchHierarchy<NDIM>> patch_hierarchy,
 ```
 
 Keep the manual function for comparison and add this second function at the end of the file:
+
+**Edit `kinetic_energy.cpp`:** Append the function after the manual-energy function. Original location: [`example.cpp`, lines 251–276](../examples/navier_stokes/ex1/example.cpp#L251-L276).
 
 ```cpp
 double
@@ -434,12 +484,16 @@ The velocity and weight lookups identify the same data used in the manual functi
 
 Immediately after the initial manual-energy output line, add:
 
+**Edit `kinetic_energy.cpp`:** Add after the initial manual-energy output, before the time-loop comment. Original location: [`example.cpp`, line 194](../examples/navier_stokes/ex1/example.cpp#L194).
+
 ```cpp
 const double initial_energy = compute_kinetic_energy(patch_hierarchy, time_integrator, rho);
 pout << "KINETIC_ENERGY " << loop_time << " " << std::setprecision(17) << initial_energy << "\n";
 ```
 
 Inside the time loop, immediately after the manual-energy output line, add:
+
+**Edit `kinetic_energy.cpp`:** Add after the manual-energy output inside the time loop. Original location: [`example.cpp`, line 209](../examples/navier_stokes/ex1/example.cpp#L209).
 
 ```cpp
 const double energy = compute_kinetic_energy(patch_hierarchy, time_integrator, rho);

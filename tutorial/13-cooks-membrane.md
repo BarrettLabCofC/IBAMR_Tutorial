@@ -10,6 +10,8 @@ This is a solid-only model with no fluid–structure interaction (FSI). The fini
 
 Use the configured build and ExodusII visualization workflow from [tutorial 07](07-finite-element-ring.md). This example uses `examples/fe_mechanics/ex0`. Your IBAMR installation needs 3D support and libMesh with ExodusII support.
 
+Line numbers below refer to the supplied repository files before the edits in this tutorial. Use the named function or input block to find the same location after adding code.
+
 ## Running the example
 
 Configure the repository to include the Cook’s membrane application and build it.
@@ -57,6 +59,8 @@ Follow these excerpts alongside the [application](../examples/fe_mechanics/ex0/e
 
 The input chooses four-node tetrahedra and sets the subdivisions used to generate the reference mesh.
 
+**Read:** [`input3d`, lines 9–15](../examples/fe_mechanics/ex0/input3d#L9-L15).
+
 ```text
 N_X = 8
 N_Y = ceil(N_X * (L_Y / L_X))
@@ -65,6 +69,8 @@ ELEM_TYPE = "TET4"
 ```
 
 The supplied input gives `N_Y = 8` and `N_Z = 1`. The program tetrahedralizes the unit cube, then maps each node to the panel.
+
+**Read:** [`example.cpp`, lines 276–278](../examples/fe_mechanics/ex0/example.cpp#L276-L278).
 
 ```cpp
 libMesh::Point s = **nd;
@@ -78,6 +84,8 @@ The map changes the first two coordinates and leaves $z$ from `0` to `1`. The le
 
 The program reads the support stiffness, load amplitude, and ramp time from the input.
 
+**Read:** [`example.cpp`, lines 289–291](../examples/fe_mechanics/ex0/example.cpp#L289-L291).
+
 ```cpp
 kappa = input_db->getDouble("KAPPA");
 traction_force = input_db->getDouble("TRACTION_FORCE");
@@ -85,6 +93,8 @@ load_time = input_db->getDouble("LOAD_TIME");
 ```
 
 In `solid_surface_force_function`, the callback arguments `X` and `x` are the reference and current positions. The function checks the boundary ID of the element side before assigning the surface force.
+
+**Read:** [`example.cpp`, lines 65–77](../examples/fe_mechanics/ex0/example.cpp#L65-L77).
 
 ```cpp
 const auto dim = elem->dim();
@@ -106,16 +116,20 @@ On the left face (ID `4`), the callback applies a spring-like traction `kappa * 
 
 On the right face (ID `2`), the applied traction points upward. The other faces have zero applied traction.
 
+**Read:** [`input3d`, lines 26–34](../examples/fe_mechanics/ex0/input3d#L26-L34).
+
 ```text
 LOAD_TIME = .05
 TRACTION_FORCE = 6.25
 ```
 
-During the ramp, `time_ramp` evaluates $3s^2-2s^3$ with $s=t/t_{\mathrm{load}}$, where `LOAD_TIME` gives $t_{\mathrm{load}}$. It returns `1` at and after time `0.05`, so the upward traction then stays at `6.25`. The value is force per unit reference area. The loaded face is `1.6` units high and `1` unit thick, so the total upward force at full load is `6.25 × 1.6 = 10`.
+In [`example.cpp`, lines 180–191](../examples/fe_mechanics/ex0/example.cpp#L180-L191), `time_ramp` evaluates $3s^2-2s^3$ with $s=t/t_{\mathrm{load}}$, where `LOAD_TIME` gives $t_{\mathrm{load}}$. It returns `1` at and after time `0.05`, so the upward traction then stays at `6.25`. The value is force per unit reference area. The loaded face is `1.6` units high and `1` unit thick, so the total upward force at full load is `6.25 × 1.6 = 10`.
 
 ### Supply the material response and damping
 
 The active input selects the modified neo-Hookean stress and includes the volume-change term.
+
+**Read:** [`input3d`, lines 22–32](../examples/fe_mechanics/ex0/input3d#L22-L32).
 
 ```text
 USE_STATIC_PRESSURE = FALSE
@@ -124,7 +138,7 @@ STRESS_FUNCTION = "MODIFIED"
 USE_VOLUMETRIC_TERM = TRUE
 ```
 
-The `MODIFIED` branch registers `PK1_dev_stress_function_mod`. This callback supplies the part of the first Piola–Kirchhoff stress associated with shape change. The application also registers `PK1_dil_stress_function`, which supplies the part associated with changes in volume. The two contributions come from the strain energy per reference volume
+The `MODIFIED` branch at [`example.cpp`, lines 328–334](../examples/fe_mechanics/ex0/example.cpp#L328-L334) registers `PK1_dev_stress_function_mod`, defined at [`example.cpp`, lines 80–95](../examples/fe_mechanics/ex0/example.cpp#L80-L95). This callback supplies the part of the first Piola–Kirchhoff stress associated with shape change. The application registers `PK1_dil_stress_function` at [`example.cpp`, lines 357–363](../examples/fe_mechanics/ex0/example.cpp#L357-L363); its definition at [`example.cpp`, lines 127–141](../examples/fe_mechanics/ex0/example.cpp#L127-L141) supplies the part associated with changes in volume. The two contributions come from the strain energy per reference volume
 
 $
 W = \frac{G}{2}\left(J^{-2/3}\operatorname{tr}(\mathbf F^T\mathbf F)-3\right)
@@ -136,11 +150,15 @@ Here $G$ and $K$ come from `SHEAR_MOD` and `BULK_MOD`. The first term uses the v
 
 The body-force callback needs the solid velocity. The program attaches the velocity system to the callback through its `SystemData` entry.
 
+**Read:** [`example.cpp`, line 320](../examples/fe_mechanics/ex0/example.cpp#L320).
+
 ```cpp
 velocity_data[0] = SystemData(fem_solver->getVelocitySystemName(), vars);
 ```
 
-The solver supplies the velocity at each point where it evaluates the force. The callback reads that velocity as `U` and applies the force below, with `damping` read from `ETA`.
+The solver supplies the velocity at each point where it evaluates the force. The callback reads that velocity as `U` and applies the force below, with `damping` read from `ETA` at [`example.cpp`, line 288](../examples/fe_mechanics/ex0/example.cpp#L288).
+
+**Read:** [`example.cpp`, line 155](../examples/fe_mechanics/ex0/example.cpp#L155).
 
 ```cpp
 F = -damping * U;
@@ -152,6 +170,8 @@ This force opposes motion throughout the solid. As the load ramps up, the panel 
 
 `FEMechanicsExplicitIntegrator` receives the mesh and its input database. The program registers the surface and body force callbacks with it.
 
+**Read:** [`example.cpp`, lines 323–326](../examples/fe_mechanics/ex0/example.cpp#L323-L326).
+
 ```cpp
 FEMechanicsBase::LagSurfaceForceFcnData solid_surface_force_data(solid_surface_force_function);
 FEMechanicsBase::LagBodyForceFcnData solid_body_force_data(solid_body_force_function, velocity_data);
@@ -161,11 +181,15 @@ fem_solver->registerLagBodyForceFunction(solid_body_force_data);
 
 After registering the stress callbacks, the program initializes the finite-element equation systems and data. Those systems hold the coordinates, displacement, and velocity used during the calculation. Each step follows the `MODIFIED_TRAPEZOIDAL_RULE` selected in the input and calls
 
+**Read:** [`example.cpp`, line 509](../examples/fe_mechanics/ex0/example.cpp#L509).
+
 ```cpp
 fem_solver->modifiedTrapezoidalStep(loop_time, loop_time + dt);
 ```
 
 The integrator advances the solid using the internal stress and the registered forces. This tutorial uses the following time step and support stiffness.
+
+**Read:** [`input3d`, lines 28–40](../examples/fe_mechanics/ex0/input3d#L28-L40).
 
 ```text
 DT = 0.025*CFL_MAX*DX/U_MAX
@@ -185,11 +209,15 @@ Change the surface-force callback so the upward traction varies across the thick
 
 In `$EXAMPLES_SRC/examples/fe_mechanics/ex0/example.cpp`, add this declaration immediately after `static double load_time;` in `namespace ModelData`.
 
+**Add to:** `example.cpp`, after `ModelData::load_time` at [`example.cpp`, line 42](../examples/fe_mechanics/ex0/example.cpp#L42).
+
 ```cpp
 static double load_skew;
 ```
 
 In `main`, add this line immediately after reading `LOAD_TIME`.
+
+**Add to:** `example.cpp`, after the `LOAD_TIME` lookup in `main` at [`example.cpp`, line 291](../examples/fe_mechanics/ex0/example.cpp#L291).
 
 ```cpp
 load_skew = input_db->getDouble("LOAD_SKEW");
@@ -201,11 +229,15 @@ The new `LOAD_SKEW` input controls how unevenly the traction is distributed. The
 
 In the loaded-face branch of `solid_surface_force_function`, replace
 
+**Read:** [`example.cpp`, line 72](../examples/fe_mechanics/ex0/example.cpp#L72).
+
 ```cpp
 F = libMesh::Point(0.0, time_ramp(time) * traction_force, 0.0);
 ```
 
 with
+
+**Replacement in:** `example.cpp`, the loaded-face branch of `solid_surface_force_function` ([`example.cpp`, line 72](../examples/fe_mechanics/ex0/example.cpp#L72) before editing).
 
 ```cpp
 const double load_factor = 1.0 + load_skew * (2.0 * X(2) - 1.0);
@@ -228,6 +260,8 @@ cp cook3d/input3d cook3d-skewed/
 ```
 
 In `cook3d-skewed/input3d`, add this top-level entry alongside `TRACTION_FORCE`.
+
+**Add to:** `cook3d-skewed/input3d`, beside `TRACTION_FORCE` (originally [`input3d`, line 34](../examples/fe_mechanics/ex0/input3d#L34)).
 
 ```text
 LOAD_SKEW = 0.8

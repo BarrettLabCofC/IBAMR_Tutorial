@@ -8,17 +8,23 @@ Change the finite-element ring's starting shape by editing its coordinate mappin
 
 Complete [tutorial 07](07-finite-element-ring.md), including its `elastic-ring` run to time `2.0`. That run is the baseline. This tutorial uses the same `examples/IBFE/explicit/ex1` application and its `IBFE-ex1` build target.
 
+Line numbers below refer to the supplied repository files before the edits in this tutorial. Use the named function or input block to find the same location after adding code.
+
 ## Running the example
 
 ### Edit the stretch parameter
 
 Open `examples/IBFE/explicit/ex1/example.cpp` under `EXAMPLES_SRC`. Near the beginning, find `gamma` inside `namespace ModelData`:
 
+**Read:** [`example.cpp`, line 58](../examples/IBFE/explicit/ex1/example.cpp#L58).
+
 ```cpp
 static const double gamma = 0.15;
 ```
 
 Change it to:
+
+**Replace in:** `example.cpp`, `ModelData::gamma` ([`example.cpp`, line 58](../examples/IBFE/explicit/ex1/example.cpp#L58) before editing).
 
 ```cpp
 static const double gamma = 0.05;
@@ -92,6 +98,8 @@ Save the paired images and measurements with the corresponding runs.
 
 The source groups the structural parameters in `ModelData`:
 
+**Read:** [`example.cpp`, lines 56–59](../examples/IBFE/explicit/ex1/example.cpp#L56-L59) in `ModelData`. The excerpt shows `gamma` after your edit.
+
 ```cpp
 static const double R = 0.25;
 static const double w = 0.0625;
@@ -102,6 +110,8 @@ static const double mu = 1.0;
 `R` and `w` describe the material strip, `gamma` sets the added vertical stretch, and `mu` is the structural elastic coefficient. Your edit changes `gamma` to `0.05`.
 
 The mapping writes the initial physical coordinates:
+
+**Read:** [`example.cpp`, lines 65–66](../examples/IBFE/explicit/ex1/example.cpp#L65-L66).
 
 ```cpp
 X(0) = (R + s(1)) * cos(s(0) / R) + 0.5;
@@ -122,11 +132,15 @@ At the outer edge, `s(1) = w`. The mapping gives horizontal radius `R+w = 0.3125
 
 The application registers the mapping with `IBFEMethod`:
 
+**Read:** [`example.cpp`, line 244](../examples/IBFE/explicit/ex1/example.cpp#L244).
+
 ```cpp
 ib_method_ops->registerInitialCoordinateMappingFunction(coordinate_mapping_function);
 ```
 
 This passes the function to the finite-element method. Later, the call
+
+**Read:** [`example.cpp`, line 351](../examples/IBFE/explicit/ex1/example.cpp#L351).
 
 ```cpp
 ib_method_ops->initializeFEData();
@@ -139,6 +153,8 @@ Once initialization is complete, `advanceHierarchy(dt)` evolves those coordinate
 ### Connect the changed shape to the elastic stress
 
 The stress callback uses
+
+**Read:** [`example.cpp`, line 83](../examples/IBFE/explicit/ex1/example.cpp#L83).
 
 ```cpp
 PP = (mu / w) * FF;

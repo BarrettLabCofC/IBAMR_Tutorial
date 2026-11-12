@@ -113,6 +113,8 @@ The rubber band is an immersed curve, with fluid on both sides. Its points and s
 
 Open `curve2d_64.vertex`. Its first three lines are:
 
+**Read:** [`curve2d_64.vertex`, lines 1–3](../examples/IB/explicit/ex1/curve2d_64.vertex#L1-L3).
+
 ```text
 304
 6.7857142857142860e-01 5.0000000000000000e-01
@@ -126,6 +128,8 @@ These coordinates form an ellipse centered at `(0.5, 0.5)`, with approximate bou
 ### Connections: the spring file
 
 Open `curve2d_64.spring`. Its first three lines are:
+
+**Read:** [`curve2d_64.spring`, lines 1–3](../examples/IB/explicit/ex1/curve2d_64.spring#L1-L3).
 
 ```text
 304
@@ -143,6 +147,8 @@ The first line counts spring connections. Each subsequent record has four column
 | Resting length | Length at which that spring exerts zero force |
 
 The last record is:
+
+**Read:** [`curve2d_64.spring`, line 305](../examples/IB/explicit/ex1/curve2d_64.spring#L305).
 
 ```text
    303      0 1.9353241079974475e+02 0.0000000000000000e+00
@@ -172,6 +178,8 @@ Here $\mathbf X_i$ and $\mathbf X_j$ are current point positions, $\ell_{ij}$ is
 The resting lengths in this file are zero. The initial ellipse is therefore under tension; its starting distances are not the springs' resting lengths. The structure forces act on the fluid, and the resulting fluid velocity moves the points. The band widens and shortens, overshoots a round shape, then swings back. In the saved frames, its height-to-width ratio reaches a minimum near time `0.27` and a lower local maximum near `0.55`.
 
 The input can replace coefficients supplied by the spring file. Find the following `IBStandardInitializer` block; the top-level constants used here are `PI = 3.14159265358979`, `K = 1.0`, and the existing grid settings in the input:
+
+**Read:** [`input2d`, lines 96–116](../examples/IB/explicit/ex1/input2d#L96-L116).
 
 ```text
 IBStandardInitializer {
@@ -209,6 +217,8 @@ In the fluid-only example, `time_integrator` referred directly to the fluid inte
 
 The application then creates the IB strategy and the integrator that coordinates the coupled simulation:
 
+**Read:** [`example.cpp`, lines 122–127](../examples/IB/explicit/ex1/example.cpp#L122-L127).
+
 ```cpp
 Pointer<IBMethod> ib_method_ops = new IBMethod("IBMethod", app_initializer->getComponentDatabase("IBMethod"));
 Pointer<IBHierarchyIntegrator> time_integrator =
@@ -224,6 +234,8 @@ The `IBMethod` constructor receives its object name and the `IBMethod` input dat
 
 The input selects the spreading/interpolation kernel through:
 
+**Read:** [`input2d`, line 18](../examples/IB/explicit/ex1/input2d#L18) for `DELTA_FUNCTION` and [`input2d`, lines 91–94](../examples/IB/explicit/ex1/input2d#L91-L94) for `IBMethod`.
+
 ```text
 DELTA_FUNCTION = "IB_4"
 
@@ -238,6 +250,8 @@ IBMethod {
 ### Register the initializer and force generator
 
 Find:
+
+**Read:** [`example.cpp`, lines 146–150](../examples/IB/explicit/ex1/example.cpp#L146-L150).
 
 ```cpp
 Pointer<IBStandardInitializer> ib_initializer = new IBStandardInitializer(
@@ -257,6 +271,8 @@ This separation lets one application choose geometry and structural forces while
 
 The new `IBHierarchyIntegrator` input block supplies settings to that coupled integrator. Its `dt_max = DT` entry uses this stiffness-dependent step bound:
 
+**Read:** [`input2d`, lines 8–29](../examples/IB/explicit/ex1/input2d#L8-L29).
+
 ```text
 K = 1.0
 DT = (1.0/K)*1.6e-2*DX_FINEST
@@ -268,11 +284,15 @@ DT = (1.0/K)*1.6e-2*DX_FINEST
 
 The new output setting is the addition of the structure writer to `Main.viz_writer`:
 
+**Read:** [`input2d`, line 174](../examples/IB/explicit/ex1/input2d#L174).
+
 ```text
 viz_writer = "VisIt","Silo"
 ```
 
 The application obtains and registers separate fluid and structure writers. Find these lines in `example.cpp`:
+
+**Read:** [`example.cpp`, lines 200–201](../examples/IB/explicit/ex1/example.cpp#L200-L201).
 
 ```cpp
 Pointer<VisItDataWriter<NDIM>> visit_data_writer = app_initializer->getVisItDataWriter();
@@ -280,6 +300,8 @@ Pointer<LSiloDataWriter> silo_data_writer = app_initializer->getLSiloDataWriter(
 ```
 
 Within the following `uses_visit` block:
+
+**Read:** [`example.cpp`, lines 204–206](../examples/IB/explicit/ex1/example.cpp#L204-L206).
 
 ```cpp
 ib_initializer->registerLSiloDataWriter(silo_data_writer);
@@ -290,6 +312,8 @@ ib_method_ops->registerLSiloDataWriter(silo_data_writer);
 The initializer registers the structure representation with the Silo writer, and the IB method connects that writer to the evolving structure data. The coupled integrator connects the fluid output to the VisIt writer. These registrations happen before hierarchy initialization, so both output systems are ready when the initial state is saved.
 
 After initialization, the application saves an initial state and then writes at the configured intervals and final step, following the pattern in tutorial 02. Each write uses:
+
+**Read:** [`example.cpp`, lines 234–236](../examples/IB/explicit/ex1/example.cpp#L234-L236).
 
 ```cpp
 time_integrator->setupPlotData();
@@ -303,6 +327,8 @@ Both writers receive the same step and physical time. That is why `dumps.visit` 
 
 After registering the model providers and output writers, the application calls:
 
+**Read:** [`example.cpp`, line 210](../examples/IB/explicit/ex1/example.cpp#L210).
+
 ```cpp
 time_integrator->initializePatchHierarchy(patch_hierarchy, gridding_algorithm);
 ```
@@ -310,6 +336,8 @@ time_integrator->initializePatchHierarchy(patch_hierarchy, gridding_algorithm);
 The hierarchy and gridding arguments have the roles introduced in tutorial 03. Calling through the IB integrator now initializes both the fluid fields and the immersed structure. The structure's point positions and spring information are available for the subsequent coupled advance.
 
 The application then releases the temporary initialization objects:
+
+**Read:** [`example.cpp`, lines 213–215](../examples/IB/explicit/ex1/example.cpp#L213-L215).
 
 ```cpp
 ib_method_ops->freeLInitStrategy();
@@ -320,6 +348,8 @@ app_initializer.setNull();
 The simulation retains its initialized state and force generator. These calls release setup resources after their work is complete; they do not remove the moving structure. In particular, the force generator is still needed each time the structure force is evaluated.
 
 Inside the time loop, locate the familiar calls:
+
+**Read:** [`example.cpp`, lines 252–254](../examples/IB/explicit/ex1/example.cpp#L252-L254).
 
 ```cpp
 dt = time_integrator->getMaximumTimeStepSize();

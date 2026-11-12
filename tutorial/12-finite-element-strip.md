@@ -10,6 +10,8 @@ Watch the strip bend and swing back between its held ends. Then add a spatially 
 
 Use the configured build and the finite-element visualization workflow from [tutorial 07](07-finite-element-ring.md). This example is `examples/IBFE/explicit/ex2` and uses the same IBAMR installation with libMesh and ExodusII support.
 
+Line numbers below refer to the supplied repository files before the edits in this tutorial. Use the named function or input block to find the same location after adding code.
+
 ## Running the example
 
 Configure the repository to include the strip application, then build it.
@@ -55,6 +57,8 @@ Follow the excerpts alongside the [application](../examples/IBFE/explicit/ex2/ex
 
 The input sets the mesh element type and spacing relative to the finest fluid grid.
 
+**Read:** [`input2d`, lines 12–14](../examples/IBFE/explicit/ex2/input2d#L12-L14).
+
 ```text
 DX = L/NFINEST
 MFAC = 2.0
@@ -63,11 +67,15 @@ ELEM_TYPE = "QUAD9"
 
 The application reads these values and generates a rectangular reference mesh.
 
+**Read:** [`example.cpp`, lines 165–167](../examples/IBFE/explicit/ex2/example.cpp#L165-L167).
+
 ```cpp
 const double dx = input_db->getDouble("DX");
 const double ds = input_db->getDouble("MFAC") * dx;
 string elem_type = input_db->getString("ELEM_TYPE");
 ```
+
+**Read:** [`example.cpp`, lines 169–176](../examples/IBFE/explicit/ex2/example.cpp#L169-L176).
 
 ```cpp
 MeshTools::Generation::build_square(mesh,
@@ -84,6 +92,8 @@ The strip spans `0.95` to `1.05` in $x$ and `0` to `1` in $y$. `ds` sets the tar
 
 The application then visits exterior sides of the mesh. For this rectangle, boundary IDs `0` and `2` label the bottom and top edges.
 
+**Read:** [`example.cpp`, lines 202–205](../examples/IBFE/explicit/ex2/example.cpp#L202-L205).
+
 ```cpp
 if (boundary_info.has_boundary_id(elem, side, 0) || boundary_info.has_boundary_id(elem, side, 2))
 {
@@ -96,6 +106,8 @@ The added boundary ID marks both displacement components as zero there. When IBA
 ### Drive the fluid with a pressure difference
 
 The fluid boundary inputs use the component and face numbering from [tutorial 09](09-target-forces-and-boundaries.md). `VelocityBcCoefs_0` sets the horizontal component and `VelocityBcCoefs_1` sets the vertical component.
+
+**Read:** [`input2d`, lines 50–82](../examples/IBFE/explicit/ex2/input2d#L50-L82).
 
 ```text
 VelocityBcCoefs_0 {
@@ -147,15 +159,21 @@ On the bottom and top faces, `VelocityBcCoefs_1` sets the normal velocity to zer
 
 In `namespace ModelData`, the structural coefficient is
 
+**Read:** [`example.cpp`, line 54](../examples/IBFE/explicit/ex2/example.cpp#L54).
+
 ```cpp
 static const double mu = 10.0;
 ```
 
 The two functions below it each fill the output tensor `PP` from the deformation gradient `FF`.
 
+**Read:** [`example.cpp`, line 68](../examples/IBFE/explicit/ex2/example.cpp#L68).
+
 ```cpp
 PP = mu * FF;
 ```
+
+**Read:** [`example.cpp`, line 83](../examples/IBFE/explicit/ex2/example.cpp#L83).
 
 ```cpp
 PP = -mu * tensor_inverse_transpose(FF, NDIM);
@@ -177,6 +195,8 @@ This is the logarithmic form with the first Lamé parameter $\lambda=0$. Differe
 
 The program registers the two contributions separately so each can use its own integration rule.
 
+**Read:** [`example.cpp`, lines 270–277](../examples/IBFE/explicit/ex2/example.cpp#L270-L277).
+
 ```cpp
 IBFEMethod::PK1StressFcnData PK1_dev_stress_data(PK1_dev_stress_function);
 IBFEMethod::PK1StressFcnData PK1_dil_stress_data(PK1_dil_stress_function);
@@ -188,7 +208,7 @@ ib_method_ops->registerPK1StressFunction(PK1_dev_stress_data);
 ib_method_ops->registerPK1StressFunction(PK1_dil_stress_data);
 ```
 
-The input sets `PK1_DEV_QUAD_ORDER = "FIFTH"` and `PK1_DIL_QUAD_ORDER = "THIRD"`. These orders control how each contribution is integrated over the elements. During the advance, `IBFEMethod` evaluates the callbacks and uses the resulting stresses in the weak force calculation from tutorial 07. Changing the shared `mu` scales both contributions together.
+The input sets `PK1_DEV_QUAD_ORDER = "FIFTH"` and `PK1_DIL_QUAD_ORDER = "THIRD"` at [`input2d`, lines 15–16](../examples/IBFE/explicit/ex2/input2d#L15-L16). These orders control how each contribution is integrated over the elements. During the advance, `IBFEMethod` evaluates the callbacks and uses the resulting stresses in the weak force calculation from tutorial 07. Changing the shared `mu` scales both contributions together.
 
 ## Further exploration: vary the material stiffness in C++
 
@@ -197,6 +217,8 @@ Make the strip stiffer near its supports while keeping the middle at the baselin
 ### Define the material profile
 
 In `$EXAMPLES_SRC/examples/IBFE/explicit/ex2/example.cpp`, keep `mu = 10.0`. Add this helper immediately below it, inside `namespace ModelData`.
+
+**Add to:** `example.cpp`, after `ModelData::mu` at [`example.cpp`, line 54](../examples/IBFE/explicit/ex2/example.cpp#L54).
 
 ```cpp
 double
@@ -215,17 +237,23 @@ The stiffness is assigned by material position, so it stays with that part of th
 
 In the signatures of `PK1_dev_stress_function` and `PK1_dil_stress_function`, replace the argument line `const libMesh::Point& /*s*/,` with
 
+**Replace in:** `example.cpp`, the reference-position arguments in `PK1_dev_stress_function` and `PK1_dil_stress_function` ([`example.cpp`, line 61](../examples/IBFE/explicit/ex2/example.cpp#L61) and [`example.cpp`, line 76](../examples/IBFE/explicit/ex2/example.cpp#L76) before editing).
+
 ```cpp
 const libMesh::Point& s,
 ```
 
 This gives a name to the reference-position argument that the callbacks already receive. In `PK1_dev_stress_function`, replace `PP = mu * FF;` with
 
+**Replace in:** `example.cpp`, `PK1_dev_stress_function` ([`example.cpp`, line 68](../examples/IBFE/explicit/ex2/example.cpp#L68) before editing).
+
 ```cpp
 PP = local_shear_modulus(s) * FF;
 ```
 
 In `PK1_dil_stress_function`, replace `PP = -mu * tensor_inverse_transpose(FF, NDIM);` with
+
+**Replace in:** `example.cpp`, `PK1_dil_stress_function` ([`example.cpp`, line 83](../examples/IBFE/explicit/ex2/example.cpp#L83) before editing).
 
 ```cpp
 PP = -local_shear_modulus(s) * tensor_inverse_transpose(FF, NDIM);

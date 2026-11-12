@@ -24,7 +24,7 @@ cp "$EXAMPLES_SRC/examples/IB/explicit/ex1/curve2d_128.vertex" elastic-loop-refi
 cp "$EXAMPLES_SRC/examples/IB/explicit/ex1/curve2d_128.spring" elastic-loop-refined/
 ```
 
-If that directory already exists, choose a fresh name and use it consistently. Edit `elastic-loop-refined/input2d`. Change these two top-level assignments:
+If that directory already exists, choose a fresh name and use it consistently. Edit `$EXAMPLES_BUILD/examples/IB/explicit/ex1/elastic-loop-refined/input2d`. Change the top-level assignments copied from [`input2d`, lines 11–12](../examples/IB/explicit/ex1/input2d#L11-L12):
 
 | Setting | Baseline | Refined run |
 | --- | --- | --- |
@@ -33,11 +33,15 @@ If that directory already exists, choose a fresh name and use it consistently. E
 
 Keep `N = 64`. Inside `IBStandardInitializer`, change the structure name:
 
+**Edit:** `elastic-loop-refined/input2d`, `IBStandardInitializer.structure_names` ([`input2d`, line 98](../examples/IB/explicit/ex1/input2d#L98) before editing).
+
 ```text
 structure_names = "curve2d_128"
 ```
 
 Rename its nested structure block to match, keeping its entries:
+
+**Edit the same run input:** rename the nested `curve2d_64` block ([`input2d`, lines 112–115](../examples/IB/explicit/ex1/input2d#L112-L115) before editing).
 
 ```text
 curve2d_128 {
@@ -111,11 +115,15 @@ Save your measurements with the inputs and logs. Save a grid-level image and the
 
 ## The input and program
 
+The application source and supplied input are in `examples/IB/explicit/ex1` under `EXAMPLES_SRC`.
+
 ### Levels, patches, and cell width
 
 The coarsest grid still covers the full domain with `N = 64` cells per direction. The additional level covers selected regions with smaller cells. Each level consists of rectangular patches. This arrangement is called adaptive mesh refinement, or AMR.
 
 The existing input expressions calculate the finest resolution:
+
+**Read:** [`input2d`, lines 14–15](../examples/IB/explicit/ex1/input2d#L14-L15).
 
 ```text
 NFINEST = (REF_RATIO^(MAX_LEVELS - 1))*N
@@ -125,6 +133,8 @@ DX_FINEST = L/NFINEST
 With `MAX_LEVELS = 2` and `REF_RATIO = 2`, level `0` has cell width `1/64`, and level `1` has cell width `1/128`. `MAX_LEVELS` counts levels; level numbers start at zero.
 
 Inside `GriddingAlgorithm`, the existing entries connect these constants to grid construction:
+
+**Read:** [`input2d`, lines 199–206](../examples/IB/explicit/ex1/input2d#L199-L206).
 
 ```text
 max_levels = MAX_LEVELS
@@ -145,11 +155,15 @@ The new vertex and spring files each begin with `608`, compared with `304` in th
 
 The initializer's existing setting
 
+**Read in the refined run input:** `IBStandardInitializer.curve2d_128`; the corresponding supplied entry is [`input2d`, line 113](../examples/IB/explicit/ex1/input2d#L113).
+
 ```text
 level_number = MAX_LEVELS - 1
 ```
 
 places this structure on level `1`, the finest permitted level. Its reference-spacing calculation uses the finer `dx = L/NFINEST`. For this input, doubling the number of points halves `ds`, while the existing override remains:
+
+**Read in the refined run input:** `IBStandardInitializer.curve2d_128`; the corresponding supplied entry is [`input2d`, line 114](../examples/IB/explicit/ex1/input2d#L114).
 
 ```text
 uniform_spring_stiffness = K/ds
@@ -161,6 +175,8 @@ The zero resting lengths and closed-chain connections are retained. Using only a
 
 The time-step expression also follows the finest grid spacing:
 
+**Read:** [`input2d`, line 29](../examples/IB/explicit/ex1/input2d#L29).
+
 ```text
 DT = (1.0/K)*1.6e-2*DX_FINEST
 ```
@@ -171,6 +187,8 @@ It gives `0.000125` for this run, half the original bound. This comparison refin
 
 Open the supplied [application](../examples/IB/explicit/ex1/example.cpp). The grid helpers were introduced in tutorial 03. Here, focus on the object that connects refinement decisions to the coupled integrator:
 
+**Read:** [`example.cpp`, lines 131–134](../examples/IB/explicit/ex1/example.cpp#L131-L134).
+
 ```cpp
 Pointer<StandardTagAndInitialize<NDIM>> error_detector =
     new StandardTagAndInitialize<NDIM>("StandardTagAndInitialize",
@@ -179,6 +197,8 @@ Pointer<StandardTagAndInitialize<NDIM>> error_detector =
 ```
 
 The constructor receives its name, the coupled `time_integrator`, and its input database. The database selects:
+
+**Read:** [`input2d`, lines 217–219](../examples/IB/explicit/ex1/input2d#L217-L219).
 
 ```text
 StandardTagAndInitialize {
@@ -192,6 +212,8 @@ At initial grid construction, the initializer identifies cells needed for the st
 
 The input still has:
 
+**Read:** [`input2d`, line 31](../examples/IB/explicit/ex1/input2d#L31).
+
 ```text
 VORTICITY_TAGGING = FALSE
 ```
@@ -204,11 +226,15 @@ For the interfaces involved, see the [`IBMethod` documentation](https://ibamr.gi
 
 The top-level input contains:
 
+**Read:** [`input2d`, line 33](../examples/IB/explicit/ex1/input2d#L33).
+
 ```text
 REGRID_CFL_INTERVAL = 0.5
 ```
 
 Inside `IBHierarchyIntegrator`, it is supplied as:
+
+**Read:** [`input2d`, line 84](../examples/IB/explicit/ex1/input2d#L84).
 
 ```text
 regrid_cfl_interval = REGRID_CFL_INTERVAL
