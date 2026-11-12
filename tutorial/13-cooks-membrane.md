@@ -4,7 +4,7 @@
 
 Cook’s membrane is a tapered elastic panel. Here it has a thickness of one unit and is meshed with tetrahedra. A penalty support holds the left face close to its starting position. An upward traction on the right face ramps up from zero and then stays constant. The panel bends upward, and damping slows its motion.
 
-This is a solid-only model with no fluid–structure interaction (FSI). The finite-element solver advances the panel under the applied load, the support, and its internal elastic stresses. Run the example, then increase the load to see how the deformation changes.
+This is a solid-only model with no fluid–structure interaction (FSI). The finite-element solver advances the panel under the applied load, the support, and its internal elastic stresses. Run the example, then modify the surface-force callback to distribute the load unevenly across the thickness and twist the panel.
 
 ## Before you start
 
@@ -177,37 +177,85 @@ The tutorial uses `DT = 0.00125`, which gives `KAPPA = 50000`. At fixed mesh spa
 
 The writer saves a frame every 80 steps, so the saved times are spaced `0.1` apart.
 
-## Further exploration
+## Further exploration: load one side of the thickness more strongly
 
-Run the same executable with a larger upward load. Create a new run directory and copy the baseline input.
+Change the surface-force callback so the upward traction varies across the thickness. Keep the total upward force the same and shift more of it toward the face with reference coordinate $Z=1$.
 
-```bash
-cd "$EXAMPLES_BUILD/examples/fe_mechanics/ex0"
-mkdir cook3d-higher-load
-cp cook3d/input3d cook3d-higher-load/
-cd cook3d-higher-load
+### Read a parameter for the load distribution
+
+In `$EXAMPLES_SRC/examples/fe_mechanics/ex0/example.cpp`, add this declaration immediately after `static double load_time;` in `namespace ModelData`.
+
+```cpp
+static double load_skew;
 ```
 
-In the copied `input3d`, change `TRACTION_FORCE = 6.25` to
+In `main`, add this line immediately after reading `LOAD_TIME`.
+
+```cpp
+load_skew = input_db->getDouble("LOAD_SKEW");
+```
+
+The new `LOAD_SKEW` input controls how unevenly the traction is distributed. The application now requires this value each time it starts.
+
+### Use reference position in the surface-force callback
+
+In the loaded-face branch of `solid_surface_force_function`, replace
+
+```cpp
+F = libMesh::Point(0.0, time_ramp(time) * traction_force, 0.0);
+```
+
+with
+
+```cpp
+const double load_factor = 1.0 + load_skew * (2.0 * X(2) - 1.0);
+F = libMesh::Point(0.0, time_ramp(time) * traction_force * load_factor, 0.0);
+```
+
+The callback's `X(2)` is the material point's reference coordinate through the thickness, from `0` to `1`. With `LOAD_SKEW = 0.8`, the multiplier varies linearly from `0.2` at $Z=0$ to `1.8` at $Z=1$. The factor has an average of `1` over the reference thickness, so integrating the traction gives the same total upward force as the uniform load.
+
+The stronger load on one side also applies a twisting moment. Using reference coordinates defines the distribution on the material as the panel moves.
+
+### Build and run the modified application
+
+Create a new run directory and copy the baseline input.
+
+```bash
+cmake --build "$EXAMPLES_BUILD" --target fe_mechanics-ex0-3d --parallel 4
+cd "$EXAMPLES_BUILD/examples/fe_mechanics/ex0"
+mkdir cook3d-skewed
+cp cook3d/input3d cook3d-skewed/
+```
+
+In `cook3d-skewed/input3d`, add this top-level entry alongside `TRACTION_FORCE`.
 
 ```text
-TRACTION_FORCE = 9.375
+LOAD_SKEW = 0.8
 ```
 
-The application reads this value at startup. Run it with the edited input.
+Run the modified application.
 
 ```bash
+cd "$EXAMPLES_BUILD/examples/fe_mechanics/ex0/cook3d-skewed"
 ../main3d input3d
 ```
 
-Open `cook3d-higher-load/output.ex2` and use the same plots, displacement expression, and view. Compare the two panels at time `4`. In the checked runs, the corner that starts at $(7.4,8,0)$ moved upward about `0.793` under the original load and `1.082` under the larger load. These are displacements at the end of the damped time-dependent runs.
+Open `cook3d-skewed/output.ex2` in VisIt and apply the same Mesh plot and three-component displacement expression as the baseline. Change the Pseudocolor field to `dX_2`, the displacement through the thickness, and set its range to `[-0.1,0.1]`. Make the same change for the baseline output. Keep the Displace multiplier at `1` and compare at time `4` using the same viewing angle. Rotate the panel to see both its broad face and its thickness.
 
-![Cook's membrane under the higher load at time 4](figures/F10-cook-higher-load.png)
+![Cook's membrane under uniform loading, colored by thickness displacement](figures/F10-cook-uniform-z.png)
 
-*Cook’s membrane at time 4 under the larger load, shown with the same view and displacement scale.*
+*Uniform loading at time 4, colored by displacement in the thickness direction.*
+
+![Cook's membrane under the nonuniform load at time 4](figures/F10-cook-skewed.png)
+
+*The total upward force matches the baseline, with a larger share applied toward the $Z=1$ side.*
+
+The uneven load makes the two sides of the loaded face rise by different amounts. The resulting twist is visible in the deformed mesh and the stronger variation in `dX_2`.
+
+To recover the uniform loading with this callback, use `LOAD_SKEW = 0.0` in a separate run's input. This sets `load_factor` to `1` everywhere on the loaded face.
 
 ## Before moving on
 
-You ran a 3D solid-only calculation, followed the support and load on the two faces through the application, and changed the load through the input file. You should have two ExodusII sequences you can compare at the same time.
+You ran a 3D solid-only calculation, followed the support and load on the two faces through the application, and modified the surface-force callback to vary the load across the thickness. You should have two ExodusII sequences you can compare at the same time.
 
 The next tutorial returns to flow around a cylinder and shows how the immersed interface method represents changes across the cylinder surface.

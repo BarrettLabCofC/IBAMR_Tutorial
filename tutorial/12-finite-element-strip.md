@@ -4,7 +4,7 @@
 
 A thin elastic strip stands vertically across the middle of a rectangular fluid domain. Its top and bottom edges are fixed, leaving the middle free to bend. The pressure is higher at the left side of the domain than at the right, so the fluid pushes the strip to the right. The strip pushes back on the fluid as it deforms.
 
-Watch the strip bend and swing back between its held ends. Then increase its stiffness and compare the motion of the two strips at the same times.
+Watch the strip bend and swing back between its held ends. Then add a spatially varying stiffness in C++ to make the material stiffer near the supports, and compare the motion.
 
 ## Before you start
 
@@ -190,35 +190,72 @@ ib_method_ops->registerPK1StressFunction(PK1_dil_stress_data);
 
 The input sets `PK1_DEV_QUAD_ORDER = "FIFTH"` and `PK1_DIL_QUAD_ORDER = "THIRD"`. These orders control how each contribution is integrated over the elements. During the advance, `IBFEMethod` evaluates the callbacks and uses the resulting stresses in the weak force calculation from tutorial 07. Changing the shared `mu` scales both contributions together.
 
-## Further exploration: increase the strip stiffness
+## Further exploration: vary the material stiffness in C++
 
-In `$EXAMPLES_SRC/examples/IBFE/explicit/ex2/example.cpp`, change `static const double mu = 10.0;` to
+Make the strip stiffer near its supports while keeping the middle at the baseline stiffness. You will supply the local coefficient from the reference position passed to each stress callback.
+
+### Define the material profile
+
+In `$EXAMPLES_SRC/examples/IBFE/explicit/ex2/example.cpp`, keep `mu = 10.0`. Add this helper immediately below it, inside `namespace ModelData`.
 
 ```cpp
-static const double mu = 20.0;
+double
+local_shear_modulus(const libMesh::Point& s)
+{
+    const double distance_from_middle = 2.0 * s(1) - 1.0;
+    return mu * (1.0 + distance_from_middle * distance_from_middle);
+}
 ```
 
-Rebuild the target and run with a copy of the baseline input.
+The reference coordinate `s(1)` runs from `0` at the bottom support to `1` at the top. The expression `2.0 * s(1) - 1.0` is zero in the middle and has magnitude one at either end. Squaring it gives the same variation above and below the middle. The helper returns `10` at the middle and `20` at the supports, with a smooth variation between them.
+
+The stiffness is assigned by material position, so it stays with that part of the strip as the strip moves.
+
+### Use the profile in both stress contributions
+
+In the signatures of `PK1_dev_stress_function` and `PK1_dil_stress_function`, replace the argument line `const libMesh::Point& /*s*/,` with
+
+```cpp
+const libMesh::Point& s,
+```
+
+This gives a name to the reference-position argument that the callbacks already receive. In `PK1_dev_stress_function`, replace `PP = mu * FF;` with
+
+```cpp
+PP = local_shear_modulus(s) * FF;
+```
+
+In `PK1_dil_stress_function`, replace `PP = -mu * tensor_inverse_transpose(FF, NDIM);` with
+
+```cpp
+PP = -local_shear_modulus(s) * tensor_inverse_transpose(FF, NDIM);
+```
+
+Both terms use the same coefficient at each material point. Their sum is now $\mathbf P^e=\mu_s(s)(\mathbf F-\mathbf F^{-T})$. Using the helper in both callbacks preserves the cancellation at $\mathbf F=\mathbf I$.
+
+### Rebuild and compare the motion
+
+Rebuild the existing target and use the baseline input for the new run.
 
 ```bash
 cmake --build "$EXAMPLES_BUILD" --target IBFE-ex2-2d --parallel 4
 cd "$EXAMPLES_BUILD/examples/IBFE/explicit/ex2"
-mkdir strip-stiffer
-cp strip/input2d strip-stiffer/
-cd strip-stiffer
+mkdir strip-graded
+cp strip/input2d strip-graded/
+cd strip-graded
 ../main2d input2d
 ```
 
-Check that this run also reaches time `10`. Open its fluid and structure output in VisIt and create a Time correlation for the new pair. Use the same pressure limits, view, and displaced Mesh plot. Compare the two strips at time `2`, then play both sequences to see how their motion changes.
+Open the new fluid and solid output in VisIt and create a Time correlation for this pair. Use the same view, pressure scale, and displaced Mesh plot as the baseline. Compare the motion at time `2`, then play both sequences through time `10`.
 
-![Stiffer strip and pressure at time 2](figures/F09-strip-stiffer.png)
+![Strip with spatially varying stiffness at time 2](figures/F09-strip-graded.png)
 
-*Stiffer strip at time 2, with the same view and pressure scale.*
+*The material coefficient varies smoothly from 10 in the middle to 20 at the supported ends.*
 
-At time `2`, the stiffer strip bows less than the baseline. As you play the sequences, watch the middle of each strip swing back and bend again.
+At time `2`, the strip with stiffer ends bends less than the baseline. Play the full sequences to see how the stiffness distribution changes the subsequent motion.
 
 ## Before moving on
 
-You ran a strip held at both ends, followed the fluid loading and elastic stress through the input and program, and changed the structural coefficient in C++. You should have two runs you can play in VisIt and compare at matching physical times.
+You ran a strip held at both ends, followed the fluid loading and elastic stress through the input and program, and added a local material coefficient in both stress callbacks. You should have two runs you can play in VisIt and compare at matching physical times.
 
 The next tutorial shows how a solid deforms under a prescribed surface load in a solid-only calculation. [Tutorial 13](13-cooks-membrane.md)
