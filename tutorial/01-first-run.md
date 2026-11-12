@@ -56,6 +56,31 @@ head -n 4 viz_INS2d/dumps.visit
 
 `INS2d.log` contains the application log. `viz_INS2d` contains saved fluid fields. `dumps.visit` is a small list telling VisIt where the saved states are; keep the entire visualization directory. Do not open just one numbered state if you want the time sequence. The reference run reached $t=1$, wrote 30 saved states, and produced about 2.8 MB in the run directory.
 
+## How the input file is read
+
+When the application starts, `AppInitializer` passes `input2d` to SAMRAI's input parser. The parser reads named assignments and blocks such as `Main { ... }` and stores their values in an input database. The application and its solver objects then retrieve settings from that database. See the [SAMRAI parser documentation](https://ibamr.github.io/IBAMR-docs/ibamr/classSAMRAI_1_1tbox_1_1Parser.html) for the input-reading interface.
+
+Numeric assignments can contain simple arithmetic expressions, using `+`, `-`, `*`, `/`, `^` for powers, and parentheses. They can also use names defined earlier in the file. SAMRAI keeps integer values such as `1` distinct from floating-point values such as `1.0`, so `1/2` uses integer division and gives `0`, whereas `1.0/2` promotes the operation to floating point and gives `0.5`. For example, the supplied input calculates the finest grid resolution from three settings:
+
+**Read:** [`input2d`, lines 7–10](../examples/navier_stokes/ex1/input2d#L7-L10).
+
+```text
+MAX_LEVELS = 3
+REF_RATIO = 4
+N = 16
+NFINEST = (REF_RATIO^(MAX_LEVELS - 1))*N
+```
+
+After the edits for this run, `MAX_LEVELS = 1` and `N = 64`, so the parser evaluates `NFINEST` as `(4^0)*64 = 64`. Later, it evaluates the time-step bound from that result:
+
+**Read:** [`input2d`, line 15](../examples/navier_stokes/ex1/input2d#L15).
+
+```text
+DT_MAX = 0.5/NFINEST
+```
+
+For this run, `DT_MAX` becomes `0.5/64 = 0.0078125`. Keeping dependent settings as expressions lets them follow changes to parameters such as `N`. SAMRAI evaluates these assignments when reading the file at startup and stores the resulting numbers.
+
 ## Further exploration: compare two viscosities
 
 Complete this comparison before tutorial 02, which opens both runs in VisIt.
