@@ -6,7 +6,7 @@ A guided introduction to building, running, and modifying IBAMR applications. Th
 
 This tutorial assumes basic familiarity with using the terminal and C++ syntax. Before starting, have the following installed:
 
-- **IBAMR v0.19.0**, installed either with autoibamr or manually, with 2D, Silo, and libMesh support. The finite-element tutorial also requires libMesh built with ExodusII output support. Tutorial 13 also requires 3D IBAMR support.
+- **IBAMR v0.19.0**, installed either with autoibamr or manually, with 2D, Silo, and libMesh support. The finite-element tutorial also requires libMesh built with ExodusII output support. Tutorial 13 also requires 3D IBAMR support. Tutorial 14 requires libMesh built with Triangle support.
 - **VisIt**, for opening simulation output and saving figures.
 - **Git**, to clone this repository locally.
 - **CMake 3.15 or newer** and the compiler/MPI environment matching your IBAMR installation.
@@ -52,8 +52,9 @@ Start with [tutorial 00](tutorial/00-orientation.md) and work through the tutori
 | [11. Save and restart a simulation](tutorial/11-restarting.md) | Save a checkpoint, resume from it, and compare with an uninterrupted run |
 | [12. Bend a finite-element strip in a flow](tutorial/12-finite-element-strip.md) | Run a strip held at both ends and add a spatially varying material stiffness in C++ |
 | [13. Solve a solid mechanics problem in 3D](tutorial/13-cooks-membrane.md) | Run Cook’s membrane and modify the surface-force callback to twist it with an uneven load |
+| [14. Resolve jumps across an immersed surface](tutorial/14-immersed-interface.md) | Run an IIM cylinder, inspect pressure jumps, and contrast regularized IB and IIM pressure and interior flow |
 
-More tutorials and their examples will be added as the tutorial develops.
+The planned sequence concludes with tutorial 15 on complex fluids, which will be added with its example as it is developed.
 
 ## Repository layout
 

@@ -292,4 +292,4 @@ To recover the uniform loading with this callback, use `LOAD_SKEW = 0.0` in a se
 
 You ran a 3D solid-only calculation, followed the support and load on the two faces through the application, and modified the surface-force callback to vary the load across the thickness. You should have two ExodusII sequences you can compare at the same time.
 
-The next tutorial returns to flow around a cylinder and shows how the immersed interface method represents changes across the cylinder surface.
+[Tutorial 14](14-immersed-interface.md) returns to flow around a cylinder and shows how the immersed interface method accounts for jumps across the cylinder surface.

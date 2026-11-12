@@ -1,6 +1,6 @@
 # Tutorial
 
-Follow the tutorials in order. Tutorials 00–11 cover the fundamentals; tutorials 12 onward explore more detailed models. Each tutorial explains a software task, guides you through it, and describes what you should have before continuing.
+Follow the tutorials in order. Tutorials 00–11 cover the fundamentals; tutorials 12–15 explore more detailed models. The planned sequence ends with complex fluids in tutorial 15. Each tutorial explains a software task, guides you through it, and describes what you should have before continuing.
 
 | Tutorial | Activity |
 | --- | --- |
@@ -18,6 +18,7 @@ Follow the tutorials in order. Tutorials 00–11 cover the fundamentals; tutoria
 | [11. Save and restart a simulation](11-restarting.md) | Save a checkpoint, resume from it, and compare with an uninterrupted run |
 | [12. Bend a finite-element strip in a flow](12-finite-element-strip.md) | Run a strip held at both ends and add a spatially varying material stiffness in C++ |
 | [13. Solve a solid mechanics problem in 3D](13-cooks-membrane.md) | Run solid-only Cook’s membrane and modify its surface-force callback to twist it with an uneven load |
+| [14. Resolve jumps across an immersed surface](14-immersed-interface.md) | Run an IIM cylinder, inspect pressure jumps, and contrast regularized IB and IIM pressure and interior flow |
 
 Begin with [tutorial 00](00-orientation.md), using a terminal opened at the repository's top level. The tutorials define `EXAMPLES_SRC` for this repository, `EXAMPLES_BUILD` for its build directory, and `IBAMR_ROOT` for the installed library. Keep those variables set as you work through the tutorials.
 
