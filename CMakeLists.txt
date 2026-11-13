@@ -19,3 +19,5 @@ add_subdirectory(examples/IBFE/explicit/ex1)
 add_subdirectory(examples/IBFE/explicit/ex2)
 add_subdirectory(examples/fe_mechanics/ex0)
 add_subdirectory(examples/IIM/ex0)
+
+add_subdirectory(examples/complex_fluids/ex2)

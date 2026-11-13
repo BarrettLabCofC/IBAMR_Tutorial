@@ -335,4 +335,4 @@ Save the paired pressure and interior-speed images. This comparison changes the 
 
 You ran an IIM cylinder simulation, viewed pressure and its surface jump, and followed the surface mesh, tether callback, and correction settings through the program. You should have matched IIM and regularized IB runs, synchronized fluid/surface views, and paired images showing pressure sharpness and interior flow.
 
-The final planned tutorial introduces an additional elastic stress in the fluid through the complex-fluid solver.
+In [tutorial 15](15-complex-fluids.md), run a fluid with polymer stress, then implement a PTT material model through `CFStrategy`.
