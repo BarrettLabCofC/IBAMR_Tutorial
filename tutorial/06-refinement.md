@@ -54,10 +54,15 @@ Both names must change from `curve2d_64` to `curve2d_128`: the first selects the
 
 ### Run the existing application
 
-From the new run directory:
+Change to the new run directory:
 
 ```bash
 cd "$EXAMPLES_BUILD/examples/IB/explicit/ex1/elastic-loop-refined"
+```
+
+Run the simulation:
+
+```bash
 ../main2d input2d
 ```
 

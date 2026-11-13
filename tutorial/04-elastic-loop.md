@@ -27,6 +27,11 @@ cp "$EXAMPLES_SRC/examples/IB/explicit/ex1/input2d" elastic-loop/
 cp "$EXAMPLES_SRC/examples/IB/explicit/ex1/curve2d_64.vertex" elastic-loop/
 cp "$EXAMPLES_SRC/examples/IB/explicit/ex1/curve2d_64.spring" elastic-loop/
 cd elastic-loop
+```
+
+Run the simulation:
+
+```bash
 ../main2d input2d
 ```
 
@@ -38,7 +43,17 @@ Check the outputs in the run directory:
 
 ```bash
 tail -n 15 IB2d.log
+```
+
+Inspect the fluid visualization list:
+
+```bash
 head -n 3 viz_IB2d/dumps.visit
+```
+
+Inspect the structure visualization list:
+
+```bash
 head -n 3 viz_IB2d/lag_data.visit
 ```
 

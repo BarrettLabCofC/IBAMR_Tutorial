@@ -14,10 +14,15 @@ Line numbers below refer to the supplied repository files before the edits in th
 
 ## Running the example
 
-Configure the repository to include the strip application, then build it.
+Configure the repository to include the strip application.
 
 ```bash
 cmake -S "$EXAMPLES_SRC" -B "$EXAMPLES_BUILD"
+```
+
+Compile the application:
+
+```bash
 cmake --build "$EXAMPLES_BUILD" --target IBFE-ex2-2d --parallel 4
 ```
 
@@ -28,6 +33,11 @@ cd "$EXAMPLES_BUILD/examples/IBFE/explicit/ex2"
 mkdir strip
 cp "$EXAMPLES_SRC/examples/IBFE/explicit/ex2/input2d" strip/
 cd strip
+```
+
+Run the simulation:
+
+```bash
 ../main2d input2d
 ```
 
@@ -263,14 +273,24 @@ Both terms use the same coefficient at each material point. Their sum is now $\m
 
 ### Rebuild and compare the motion
 
-Rebuild the existing target and use the baseline input for the new run.
+Rebuild the existing target:
 
 ```bash
 cmake --build "$EXAMPLES_BUILD" --target IBFE-ex2-2d --parallel 4
+```
+
+Prepare the run directory and copy the input files:
+
+```bash
 cd "$EXAMPLES_BUILD/examples/IBFE/explicit/ex2"
 mkdir strip-graded
 cp strip/input2d strip-graded/
 cd strip-graded
+```
+
+Run the simulation:
+
+```bash
 ../main2d input2d
 ```
 

@@ -48,10 +48,15 @@ The only changed assignment should be `K`. `diff` returns status `1` when it fin
 
 ### Run the existing executable
 
-No compilation or CMake configuration is needed for this input change. Run from the new directory:
+No compilation or CMake configuration is needed for this input change. Change to the new run directory:
 
 ```bash
 cd "$EXAMPLES_BUILD/examples/IB/explicit/ex1/elastic-loop-stiff"
+```
+
+Run the simulation:
+
+```bash
 ../main2d input2d
 ```
 

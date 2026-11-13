@@ -31,6 +31,11 @@ cp "$EXAMPLES_SRC/examples/IB/explicit/ex2/input2d.cylinder" cylinder/
 cp "$EXAMPLES_SRC/examples/IB/explicit/ex2/cylinder2d_128.vertex" cylinder/
 cp "$EXAMPLES_SRC/examples/IB/explicit/ex2/cylinder2d_128.spring" cylinder/
 cd cylinder
+```
+
+Run the simulation:
+
+```bash
 ../main2d input2d.cylinder
 ```
 
@@ -373,10 +378,15 @@ to
 Re = 400.0
 ```
 
-The existing `MU = 2.0*R/Re` expression calculates the new viscosity. The inlet expressions, density, geometry, and target-force parameters stay the same. Run the existing executable:
+The existing `MU = 2.0*R/Re` expression calculates the new viscosity. The inlet expressions, density, geometry, and target-force parameters stay the same. Change to the new run directory:
 
 ```bash
 cd "$EXAMPLES_BUILD/examples/IB/explicit/ex2/cylinder-Re400"
+```
+
+Run the simulation:
+
+```bash
 ../main2d input2d.cylinder
 ```
 
@@ -394,6 +404,11 @@ Inspect the last line of each run's `C_D.curve`:
 
 ```bash
 tail -n 1 "$EXAMPLES_BUILD/examples/IB/explicit/ex2/cylinder/C_D.curve"
+```
+
+Show the final drag measurement for `Re = 400`:
+
+```bash
 tail -n 1 "$EXAMPLES_BUILD/examples/IB/explicit/ex2/cylinder-Re400/C_D.curve"
 ```
 

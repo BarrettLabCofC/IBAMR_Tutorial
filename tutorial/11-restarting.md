@@ -33,6 +33,11 @@ The interval counts completed time steps. With the input from tutorial 04, step 
 
 ```bash
 ../../main2d input2d
+```
+
+List the saved checkpoints:
+
+```bash
 ls restart_IB2d
 ```
 
@@ -47,14 +52,20 @@ cd ../resumed
 cp ../checkpoint/{input2d,curve2d_64.vertex,curve2d_64.spring} .
 ```
 
-In the resumed run's `input2d`, set `Main.restart_dump_interval` back to `0`. This turns off writing new checkpoints. Leave `END_TIME = 0.6` and the rest of the input as they were. The continuation will write its log and visualization files under `resumed`.
+In the resumed run's `input2d`, set `Main.restart_dump_interval` back to `0`. This turns off writing new checkpoints. Leave `END_TIME = 0.6` and the rest of the input as they were. The continuation will write its log and visualization files under `resumed`. Locate the checkpoint file before starting the continuation:
 
 ```bash
-ls -l ../checkpoint/restart_IB2d/restore.001200/nodes.00001/proc.00000 &&
+ls -l ../checkpoint/restart_IB2d/restore.001200/nodes.00001/proc.00000
+```
+
+Resume from this checkpoint. The file test also prevents a missing checkpoint from starting a fresh simulation:
+
+```bash
+test -f ../checkpoint/restart_IB2d/restore.001200/nodes.00001/proc.00000 &&
   ../../main2d input2d ../checkpoint/restart_IB2d 1200
 ```
 
-The arguments are the input file, the parent checkpoint directory, and the saved step number. Pass `1200` for the directory named `restore.001200`. The `ls` check keeps a mistyped checkpoint path from launching a fresh run.
+The arguments are the input file, the parent checkpoint directory, and the saved step number. Pass `1200` for the directory named `restore.001200`. The `test -f` check allows the restart command to run only when that checkpoint file exists.
 
 Check the first step in the resumed run’s `IB2d.log`.
 

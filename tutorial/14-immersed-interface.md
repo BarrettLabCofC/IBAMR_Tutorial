@@ -12,10 +12,15 @@ Use the build setup from [tutorial 00](00-orientation.md), the boundary-conditio
 
 ## Running the example
 
-Configure the repository and build the IIM application.
+Configure the repository to include the IIM application.
 
 ```bash
 cmake -S "$EXAMPLES_SRC" -B "$EXAMPLES_BUILD"
+```
+
+Compile the application:
+
+```bash
 cmake --build "$EXAMPLES_BUILD" --target IIM-ex0-2d --parallel 4
 ```
 
@@ -26,6 +31,11 @@ cd "$EXAMPLES_BUILD/examples/IIM/ex0"
 mkdir iim-cylinder
 cp "$EXAMPLES_SRC/examples/IIM/ex0/input2d" iim-cylinder/
 cd iim-cylinder
+```
+
+Run the simulation:
+
+```bash
 ../main2d input2d
 ```
 
@@ -272,10 +282,15 @@ USE_VELOCITY_JUMP_CONDITIONS = FALSE
 USE_U_INTERP_CORRECTION = FALSE
 ```
 
-Turning off the pressure and velocity-derivative corrections puts the whole force into the regularized spreading calculation. Turning off the interpolation correction makes the surface velocity use the regularized IB interpolation as well. The executable and surface-force callback are unchanged.
+Turning off the pressure and velocity-derivative corrections puts the whole force into the regularized spreading calculation. Turning off the interpolation correction makes the surface velocity use the regularized IB interpolation as well. The executable and surface-force callback are unchanged. Change to the IB run directory:
 
 ```bash
 cd "$EXAMPLES_BUILD/examples/IIM/ex0/ib-cylinder"
+```
+
+Run the simulation:
+
+```bash
 ../main2d input2d
 ```
 

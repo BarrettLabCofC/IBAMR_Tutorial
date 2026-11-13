@@ -17,6 +17,11 @@ Use a new directory outside the tutorial repository. The commands use `~/my-rubb
 ```bash
 export BAND_SRC="$HOME/my-rubber-band"
 export BAND_BUILD="$BAND_SRC/build"
+```
+
+Create the project directory and copy the starting files:
+
+```bash
 mkdir "$BAND_SRC"
 cp "$EXAMPLES_SRC/examples/IB/explicit/ex1/"{example.cpp,input2d} "$BAND_SRC/"
 ```
@@ -182,7 +187,7 @@ The force generator has the same job as before. During advancement it computes f
 
 ## Build and run the generated model
 
-Configure and build your application with the new initializer. Use `Debug` in place of `Release` if you installed a debug build of IBAMR.
+Configure your application with the new initializer. Use `Debug` in place of `Release` if you installed a debug build of IBAMR.
 
 ```bash
 cmake -S "$BAND_SRC" -B "$BAND_BUILD" \
@@ -190,16 +195,26 @@ cmake -S "$BAND_SRC" -B "$BAND_BUILD" \
   -DCMAKE_C_COMPILER="$(command -v mpicc)" \
   -DCMAKE_CXX_COMPILER="$(command -v mpicxx)" \
   -DCMAKE_PREFIX_PATH="${IBAMR_ROOT:?Set the installed IBAMR prefix first}"
+```
+
+Compile the application:
+
+```bash
 cmake --build "$BAND_BUILD" --target my-rubber-band --parallel 4
 ```
 
-Run the generated model from its own directory.
+Prepare a run directory for the generated model.
 
 ```bash
 cd "$BAND_BUILD"
 mkdir generated
 cp "$BAND_SRC/input2d" generated/
 cd generated
+```
+
+Run the simulation:
+
+```bash
 ../my-rubber-band input2d
 ```
 
@@ -224,10 +239,15 @@ mkdir less-stretched
 cp generated/input2d less-stretched/
 ```
 
-In `$BAND_BUILD/less-stretched/input2d`, change `beta = 0.35` to `beta = 0.30` in the `RubberBand` block you added above. Run the same executable:
+In `$BAND_BUILD/less-stretched/input2d`, change `beta = 0.35` to `beta = 0.30` in the `RubberBand` block you added above. Change to the new run directory:
 
 ```bash
 cd "$BAND_BUILD/less-stretched"
+```
+
+Run the simulation:
+
+```bash
 ../my-rubber-band input2d
 ```
 
@@ -351,16 +371,36 @@ At that point `advanceHierarchy(dt)` has updated the structure and `loop_time` g
 
 ### Run the area diagnostic
 
-Rebuild and run with the original generated ellipse from `$BAND_SRC/input2d`.
+Rebuild the application after adding the area calculation:
 
 ```bash
 cmake --build "$BAND_BUILD" --target my-rubber-band --parallel 4
+```
+
+Prepare the run directory using the original generated ellipse from `$BAND_SRC/input2d`:
+
+```bash
 cd "$BAND_BUILD"
 mkdir area
 cp "$BAND_SRC/input2d" area/
 cd area
+```
+
+Run the simulation:
+
+```bash
 ../my-rubber-band input2d
+```
+
+Show the beginning of `band_area.curve`:
+
+```bash
 head -n 3 band_area.curve
+```
+
+Show the end of `band_area.curve`:
+
+```bash
 tail -n 1 band_area.curve
 ```
 

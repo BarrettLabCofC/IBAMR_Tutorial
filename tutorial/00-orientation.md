@@ -43,7 +43,7 @@ After either method, check the selected path:
 echo "$IBAMR_ROOT"
 ```
 
-Configure the examples:
+Configure the examples. Use `Debug` for a debug IBAMR installation. The backslashes continue this single command over several lines:
 
 ```bash
 cmake -S "$EXAMPLES_SRC" -B "$EXAMPLES_BUILD" \
@@ -51,10 +51,15 @@ cmake -S "$EXAMPLES_SRC" -B "$EXAMPLES_BUILD" \
   -DCMAKE_C_COMPILER="$(command -v mpicc)" \
   -DCMAKE_CXX_COMPILER="$(command -v mpicxx)" \
   -DCMAKE_PREFIX_PATH="${IBAMR_ROOT:?Set the installed IBAMR prefix first}"
+```
+
+Compile the application:
+
+```bash
 cmake --build "$EXAMPLES_BUILD" --target navier_stokes-ex1-2d --parallel 4
 ```
 
-Use `Debug` for a debug IBAMR installation. CMake locates the installed IBAMR package; the example's `target_link_libraries(... PRIVATE IBAMR::IBAMR2d)` supplies its headers, dependencies, and two-dimensional compile settings. See the [IBAMR application documentation](https://ibamr.github.io/applications) for this external build interface. Resolve configuration or build errors before continuing.
+CMake locates the installed IBAMR package; the example's `target_link_libraries(... PRIVATE IBAMR::IBAMR2d)` supplies its headers, dependencies, and two-dimensional compile settings. See the [IBAMR application documentation](https://ibamr.github.io/applications) for this external build interface. Resolve configuration or build errors before continuing.
 
 ## Results
 
@@ -62,7 +67,17 @@ The result of this tutorial is a configured example build and a compiled fluid a
 
 ```bash
 ls "$EXAMPLES_SRC/examples/navier_stokes/ex1/example.cpp"
+```
+
+Locate the supplied input file:
+
+```bash
 ls "$EXAMPLES_SRC/examples/navier_stokes/ex1/input2d"
+```
+
+Locate the compiled executable:
+
+```bash
 ls "$EXAMPLES_BUILD/examples/navier_stokes/ex1/main2d"
 ```
 

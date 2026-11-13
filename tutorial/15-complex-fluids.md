@@ -12,17 +12,31 @@ The supplied files are in `examples/complex_fluids/ex2`. The walkthrough refers 
 
 ## Running the example
 
-Build the application and copy its input into a run directory:
+Configure the application:
 
 ```bash
 cmake -S "$EXAMPLES_SRC" -B "$EXAMPLES_BUILD" \
   -DCMAKE_PREFIX_PATH="$IBAMR_ROOT"
-cmake --build "$EXAMPLES_BUILD" --target complex_fluids-ex2 -j 2
+```
 
+Compile the application:
+
+```bash
+cmake --build "$EXAMPLES_BUILD" --target complex_fluids-ex2 -j 2
+```
+
+Prepare the run directory and copy the input files:
+
+```bash
 cd "$EXAMPLES_BUILD/examples/complex_fluids/ex2"
 mkdir -p oldroyd-b
 cp "$EXAMPLES_SRC/examples/complex_fluids/ex2/input2d" oldroyd-b/
 cd oldroyd-b
+```
+
+Run the simulation:
+
+```bash
 ../main2d input2d
 ```
 
@@ -565,7 +579,11 @@ Rebuild after adding the header and registration:
 
 ```bash
 cmake --build "$EXAMPLES_BUILD" --target complex_fluids-ex2 -j 2
+```
 
+Prepare the run directory and copy the input files:
+
+```bash
 cd "$EXAMPLES_BUILD/examples/complex_fluids/ex2"
 mkdir -p ptt
 cp oldroyd-b/input2d ptt/
@@ -583,10 +601,15 @@ and add this entry inside `ComplexFluid`, beside `relaxation_time` and `viscosit
 epsilon = 0.25
 ```
 
-The existing `fluid_model = FLUID_MODEL` entry passes the new selection into that database. Keep the other settings identical, including `RELAXATION_TIME = 0.1` and `VISCOSITY = 0.694915`. This input edit selects the class you just compiled.
+The existing `fluid_model = FLUID_MODEL` entry passes the new selection into that database. Keep the other settings identical, including `RELAXATION_TIME = 0.1` and `VISCOSITY = 0.694915`. This input edit selects the class you just compiled. Change to the PTT run directory:
 
 ```bash
 cd "$EXAMPLES_BUILD/examples/complex_fluids/ex2/ptt"
+```
+
+Run the simulation:
+
+```bash
 ../main2d input2d
 ```
 

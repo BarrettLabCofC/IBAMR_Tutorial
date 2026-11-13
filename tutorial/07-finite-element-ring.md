@@ -12,10 +12,15 @@ Complete [tutorial 06](06-refinement.md). This example uses libMesh for the fini
 
 ### Build the finite-element application
 
-Configure the repository and build the new target:
+Configure the repository:
 
 ```bash
 cmake -S "$EXAMPLES_SRC" -B "$EXAMPLES_BUILD"
+```
+
+Compile the application:
+
+```bash
 cmake --build "$EXAMPLES_BUILD" --target IBFE-ex1 --parallel 4
 ```
 
@@ -30,6 +35,11 @@ cd "$EXAMPLES_BUILD/examples/IBFE/explicit/ex1"
 mkdir elastic-ring
 cp "$EXAMPLES_SRC/examples/IBFE/explicit/ex1/input2d" elastic-ring/
 cd elastic-ring
+```
+
+Run the simulation:
+
+```bash
 ../main2d input2d
 ```
 
@@ -418,6 +428,11 @@ The application writes `volume.curve`, with time in the first column and the int
 
 ```bash
 head -n 3 "$EXAMPLES_BUILD/examples/IBFE/explicit/ex1/elastic-ring/volume.curve"
+```
+
+Show the final rows for the baseline ring:
+
+```bash
 tail -n 3 "$EXAMPLES_BUILD/examples/IBFE/explicit/ex1/elastic-ring/volume.curve"
 ```
 

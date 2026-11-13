@@ -14,10 +14,15 @@ Line numbers below refer to the supplied repository files before the edits in th
 
 ## Running the example
 
-Configure the repository to include the Cook’s membrane application and build it.
+Configure the repository to include the Cook’s membrane application.
 
 ```bash
 cmake -S "$EXAMPLES_SRC" -B "$EXAMPLES_BUILD"
+```
+
+Compile the application:
+
+```bash
 cmake --build "$EXAMPLES_BUILD" --target fe_mechanics-ex0-3d --parallel 4
 ```
 
@@ -28,6 +33,11 @@ cd "$EXAMPLES_BUILD/examples/fe_mechanics/ex0"
 mkdir cook3d
 cp "$EXAMPLES_SRC/examples/fe_mechanics/ex0/input3d" cook3d/
 cd cook3d
+```
+
+Run the simulation:
+
+```bash
 ../main3d input3d
 ```
 
@@ -250,10 +260,15 @@ The stronger load on one side also applies a twisting moment. Using reference co
 
 ### Build and run the modified application
 
-Create a new run directory and copy the baseline input.
+Rebuild the application after changing the callback:
 
 ```bash
 cmake --build "$EXAMPLES_BUILD" --target fe_mechanics-ex0-3d --parallel 4
+```
+
+Prepare the run directory and copy the input files:
+
+```bash
 cd "$EXAMPLES_BUILD/examples/fe_mechanics/ex0"
 mkdir cook3d-skewed
 cp cook3d/input3d cook3d-skewed/
@@ -267,10 +282,15 @@ In `cook3d-skewed/input3d`, add this top-level entry alongside `TRACTION_FORCE`.
 LOAD_SKEW = 0.8
 ```
 
-Run the modified application.
+Change to the run directory for the modified application:
 
 ```bash
 cd "$EXAMPLES_BUILD/examples/fe_mechanics/ex0/cook3d-skewed"
+```
+
+Run the simulation:
+
+```bash
 ../main3d input3d
 ```
 

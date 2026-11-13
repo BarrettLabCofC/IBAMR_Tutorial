@@ -12,11 +12,21 @@ Line numbers below refer to the supplied repository files before the edits in th
 
 ## Start with the existing result
 
-Use the completed fluid run from tutorial 01 as the starting example. Before editing its source, check the output in the build directory:
+Use the completed fluid run from tutorial 01 as the starting example. Before editing its source, change to its run directory:
 
 ```bash
 cd "$EXAMPLES_BUILD/examples/navier_stokes/ex1/first-flow"
+```
+
+Show the end of the application log:
+
+```bash
 tail -n 15 INS2d.log
+```
+
+Inspect the fluid visualization list:
+
+```bash
 head -n 4 viz_INS2d/dumps.visit
 ```
 
@@ -379,10 +389,15 @@ target_link_libraries(navier_stokes-ex1-energy-2d PRIVATE IBAMR::IBAMR2d)
 set_target_properties(navier_stokes-ex1-energy-2d PROPERTIES OUTPUT_NAME main2d_energy)
 ```
 
-`add_executable` creates a separate target from the source copy, so the original fluid application remains available. `target_link_libraries` supplies the same installed 2D IBAMR interface as before. `OUTPUT_NAME` names the new executable `main2d_energy`; use the target name for building and the output name for running. Regenerate the example repository’s build configuration to register the new target, then compile it:
+`add_executable` creates a separate target from the source copy, so the original fluid application remains available. `target_link_libraries` supplies the same installed 2D IBAMR interface as before. `OUTPUT_NAME` names the new executable `main2d_energy`; use the target name for building and the output name for running. Regenerate the example repository’s build configuration to register the new target:
 
 ```bash
 cmake -S "$EXAMPLES_SRC" -B "$EXAMPLES_BUILD"
+```
+
+Compile the application:
+
+```bash
 cmake --build "$EXAMPLES_BUILD" --target navier_stokes-ex1-energy-2d --parallel 4
 ```
 
@@ -393,6 +408,11 @@ cd "$EXAMPLES_BUILD/examples/navier_stokes/ex1"
 mkdir first-flow-energy
 cp first-flow/input2d first-flow-energy/
 cd first-flow-energy
+```
+
+Run the simulation:
+
+```bash
 ../main2d_energy input2d
 ```
 
@@ -402,7 +422,17 @@ Extract the energy lines from IBAMR's `INS2d.log` into a two-column file contain
 
 ```bash
 awk '/^KINETIC_ENERGY_MANUAL / { print $2, $3 }' INS2d.log > kinetic_energy_manual.curve
+```
+
+Show the beginning of `kinetic_energy_manual.curve`:
+
+```bash
 head -n 3 kinetic_energy_manual.curve
+```
+
+Show the end of `kinetic_energy_manual.curve`:
+
+```bash
 tail -n 3 kinetic_energy_manual.curve
 ```
 
@@ -500,15 +530,30 @@ const double energy = compute_kinetic_energy(patch_hierarchy, time_integrator, r
 pout << "KINETIC_ENERGY " << loop_time << " " << std::setprecision(17) << energy << "\n";
 ```
 
-Rebuild the same target and run in a fresh build subdirectory:
+Rebuild the same target:
 
 ```bash
 cmake --build "$EXAMPLES_BUILD" --target navier_stokes-ex1-energy-2d --parallel 4
+```
+
+Prepare the run directory and copy the input files:
+
+```bash
 cd "$EXAMPLES_BUILD/examples/navier_stokes/ex1"
 mkdir first-flow-energy-dot
 cp first-flow/input2d first-flow-energy-dot/
 cd first-flow-energy-dot
+```
+
+Run the simulation:
+
+```bash
 ../main2d_energy input2d
+```
+
+Inspect the matching entries in the log:
+
+```bash
 grep '^KINETIC_ENERGY' INS2d.log | head -n 6
 ```
 

@@ -50,7 +50,17 @@ After the run, check the files in this same directory:
 
 ```bash
 ls
+```
+
+Show the end of the application log:
+
+```bash
 tail -n 15 INS2d.log
+```
+
+Inspect the fluid visualization list:
+
+```bash
 head -n 4 viz_INS2d/dumps.visit
 ```
 
@@ -109,10 +119,15 @@ to
 MU  = 0.001
 ```
 
-Keep density, grid, final time, and all other values unchanged. No rebuild is needed. Run the same program from the new directory:
+Keep density, grid, final time, and all other values unchanged. No rebuild is needed. Change to the comparison run directory:
 
 ```bash
 cd "$EXAMPLES_BUILD/examples/navier_stokes/ex1/first-flow-viscous"
+```
+
+Run the simulation:
+
+```bash
 ../main2d input2d
 ```
 

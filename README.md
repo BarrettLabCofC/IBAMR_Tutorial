@@ -15,10 +15,15 @@ The example applications link to your installed IBAMR; you do not need its sourc
 
 ## Get the tutorial
 
-Clone this repository onto your machine and enter its top-level directory:
+Clone this repository onto your machine:
 
 ```bash
 git clone https://github.com/BarrettLabCofC/IBAMR_Tutorial.git
+```
+
+Enter the cloned repository:
+
+```bash
 cd IBAMR_Tutorial
 ```
 

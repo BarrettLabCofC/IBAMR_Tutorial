@@ -46,6 +46,11 @@ cd "$EXAMPLES_BUILD/examples/IBFE/explicit/ex1"
 mkdir elastic-ring-gamma005
 cp elastic-ring/input2d elastic-ring-gamma005/
 cd elastic-ring-gamma005
+```
+
+Run the simulation:
+
+```bash
 ../main2d input2d
 ```
 
@@ -177,8 +182,23 @@ The mapping changes the ring's material area along with its height. Use the firs
 
 ```bash
 head -n 1 "$EXAMPLES_BUILD/examples/IBFE/explicit/ex1/elastic-ring/volume.curve"
+```
+
+Show the first row for the ring with reduced initial stretch:
+
+```bash
 head -n 1 "$EXAMPLES_BUILD/examples/IBFE/explicit/ex1/elastic-ring-gamma005/volume.curve"
+```
+
+Show the final row for the baseline ring:
+
+```bash
 tail -n 1 "$EXAMPLES_BUILD/examples/IBFE/explicit/ex1/elastic-ring/volume.curve"
+```
+
+Show the final row for the ring with reduced initial stretch:
+
+```bash
 tail -n 1 "$EXAMPLES_BUILD/examples/IBFE/explicit/ex1/elastic-ring-gamma005/volume.curve"
 ```
 
