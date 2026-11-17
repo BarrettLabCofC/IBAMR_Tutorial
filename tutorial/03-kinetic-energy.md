@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Follow the setup and time loop of the fluid application you have already run and visualized. Then compute kinetic energy by looping over grid levels, patches, and side indices, consult the side-operations documentation, and use `dot` to perform the same calculation.
+Follow the setup and time loop of the fluid application you have already run and visualized. Then compute kinetic energy by looping over grid levels, patches, and side indices, consult the side-operations documentation, and use `dot` to perform the same calculation. An optional extension computes and saves vorticity from the velocity field.
 
 ## Before you start
 
@@ -80,7 +80,7 @@ Read the complete [fluid application](../examples/navier_stokes/ex1/example.cpp)
 
 ### Follow a viscosity value into the solver
 
-The input selects `SOLVER_TYPE = "STAGGERED"`. The application constructs `INSStaggeredHierarchyIntegrator`, which stores pressure at cell centers and velocity components at cell faces. This layout supports the discrete pressure and incompressibility calculation. The file also contains a collocated-solver block; it is not the selected solver in this run.
+The input selects `SOLVER_TYPE = "STAGGERED"`. The application uses the common `INSHierarchyIntegrator` interface, with `INSStaggeredHierarchyIntegrator` as its selected implementation. This implementation stores pressure at cell centers and velocity components at cell faces. This layout supports the discrete pressure and incompressibility calculation. The collocated alternative stores both velocity and pressure at cell centers; its input block is present but is not selected in this run.
 
 Inside the `STAGGERED` branch, find:
 
@@ -145,7 +145,7 @@ The expression object receives the velocity database and domain geometry. The re
 
 Registration connects a provider to a solver; it does not itself advance time. The later `initializePatchHierarchy` call builds the initial hierarchy and initializes its data using the registered setup.
 
-This separation lets the fluid solver request velocity data without knowing whether the application obtains it from expressions or custom C++. For an initial field that needs more than prescribed expressions, the extension is a custom `IBTK::CartGridFunction`, providing `setDataOnPatch`. `setDataOnPatch` receives the destination data index, variable, patch, requested time, and initialization flag, along with an optional level pointer. Its job is to fill the requested patch data in the variable's layout. The same `registerVelocityInitialConditions` call connects the replacement. We will implement a provider later when adding forces.
+This separation lets the fluid solver request velocity data without knowing whether the application obtains it from expressions or custom C++. For an initial field that needs more than prescribed expressions, the extension is a custom `IBTK::CartGridFunction`, providing `setDataOnPatch`. `setDataOnPatch` receives the destination data index, variable, patch, requested time, and initialization flag, along with an optional level pointer. Its job is to fill the requested patch data in the variable's layout. The same `registerVelocityInitialConditions` call connects the replacement. The polymer force in [tutorial 15](15-complex-fluids.md) uses another force provider, `CFINSForcing`, registered with the coupled integrator.
 
 ### Build the grid and advance its data
 
@@ -220,6 +220,12 @@ The first two calls read the current step and physical time. The application the
 The application's `while` condition checks the end time and `stepsRemaining()`. The numerical work stays inside the integrator, while this outer loop handles progress messages and decides when to save data. For an IB application, an IB hierarchy integrator will occupy this coordinating role and receive both a fluid integrator and a structure strategy.
 
 Trace `END_TIME` at [`input2d`, line 17](../examples/navier_stokes/ex1/input2d#L17) through `INSStaggeredHierarchyIntegrator.end_time` at [`input2d`, line 76](../examples/navier_stokes/ex1/input2d#L76), then locate `getEndTime()` in [`example.cpp`, line 195](../examples/navier_stokes/ex1/example.cpp#L195). This shows where the application reads the integrator's stopping time; `advanceHierarchy(dt)` performs the actual update of the fields.
+
+### The time integrator and its linear solver
+
+`advanceHierarchy(dt)` coordinates the time step. Inside that work, the staggered fluid integrator prepares an algebraic system for velocity and pressure and asks its Stokes solver to solve it. Here “Stokes” names the coupled velocity–pressure solve within the time step; the overall simulation still includes the configured convection term.
+
+The time integrator and linear solver therefore have different jobs. The integrator assembles the terms for the requested step and applies the time-stepping scheme. The linear solver finds fields satisfying the resulting discrete equations. Solver iterations and residual norms in the log describe that algebraic solve, while the outer step number and simulation time track advancement of the fluid. A residual norm measures the remaining mismatch in the algebraic equations. The [v0.19.0 solve call and log output](https://github.com/IBAMR/IBAMR/blob/v0.19.0/src/navier_stokes/INSStaggeredHierarchyIntegrator.cpp#L1295-L1307) show this separation.
 
 ## The input and program
 
@@ -322,7 +328,7 @@ compute_kinetic_energy_manual(Pointer<PatchHierarchy<NDIM>> patch_hierarchy,
 }
 ```
 
-IBAMR uses a `Variable` to identify a quantity, such as velocity, and a `VariableContext` to identify which stored version of that quantity to use. Here, `getVelocityVariable()` retrieves the variable for the fluid velocity and `getCurrentContext()` select the current data. `VariableDatabase` maps this pair to `u_idx`, which is a patch data index that each patch uses to locate its velocity data. 
+IBAMR uses a `Variable` to identify a quantity, such as velocity, and a `VariableContext` to identify which stored version of that quantity to use. Here, `getVelocityVariable()` retrieves the variable for the fluid velocity and `getCurrentContext()` selects the current data. `VariableDatabase` maps this pair to `u_idx`, which is a patch data index that each patch uses to locate its velocity data.
 
 The next lookup obtains `wgt_idx`, the data index for the side-centered integration weights maintained by `HierarchyMathOps`. These weights include the integration volumes and account for shared patch boundaries and coarse/fine coverage.
 
@@ -559,8 +565,214 @@ grep '^KINETIC_ENERGY' INS2d.log | head -n 6
 
 Each time now has a `KINETIC_ENERGY_MANUAL` line from the loops and a `KINETIC_ENERGY` line from `dot`. Compare values at matching times. Small differences in the last digits can occur because the sums are accumulated in a different order.
 
+
+## Further exploration: compute and save vorticity
+
+The energy calculation reads velocity and produces one number. Now use the same completed velocity field to compute a field that you can plot. In two dimensions, the out-of-plane vorticity is
+
+$$
+\omega = \frac{\partial u_y}{\partial x}-\frac{\partial u_x}{\partial y}.
+$$
+
+You will save this result as `computed_vorticity`. This extension uses the staggered solver and periodic boundaries of the current example.
+
+### Register the result and working velocity
+
+**Edit `kinetic_energy.cpp`:** Add these headers before `app_namespaces.h`. Original location: [`example.cpp`, lines 36–37](../examples/navier_stokes/ex1/example.cpp#L36-L37). Keep the headers added for the manual and `dot` calculations.
+
+```cpp
+#include <ibtk/HierarchyGhostCellInterpolation.h>
+#include <CellVariable.h>
+```
+
+**Edit `kinetic_energy.cpp`:** Add this prototype beside the energy prototypes, before `main`. Original location: [`example.cpp`, lines 39–44](../examples/navier_stokes/ex1/example.cpp#L39-L44).
+
+```cpp
+void compute_vorticity(Pointer<PatchHierarchy<NDIM>> patch_hierarchy,
+                       Pointer<INSHierarchyIntegrator> ins_integrator,
+                       Pointer<CellVariable<NDIM, double>> vorticity_var,
+                       int vorticity_idx,
+                       int velocity_work_idx,
+                       double data_time);
+```
+
+**Edit `kinetic_energy.cpp`:** Insert the following after the VisIt writer setup and before `initializePatchHierarchy`. Original location: [`example.cpp`, lines 168–175](../examples/navier_stokes/ex1/example.cpp#L168-L175).
+
+```cpp
+if (grid_geometry->getPeriodicShift().min() <= 0)
+    TBOX_ERROR("This vorticity example requires periodic boundaries.\n");
+auto* var_db = VariableDatabase<NDIM>::getDatabase();
+Pointer<CellVariable<NDIM, double>> vorticity_var =
+    new CellVariable<NDIM, double>("computed_vorticity");
+int vorticity_idx;
+time_integrator->registerVariable(
+    vorticity_idx, vorticity_var, IntVector<NDIM>(0),
+    time_integrator->getCurrentContext(), false);
+const int velocity_work_idx = var_db->registerVariableAndContext(
+    time_integrator->getVelocityVariable(),
+    var_db->getContext("VORTICITY_WORK"), IntVector<NDIM>(1));
+if (uses_visit)
+    visit_data_writer->registerPlotQuantity("computed_vorticity", "SCALAR", vorticity_idx);
+```
+
+The vorticity result is a scalar stored at cell centers. Registering it with the time integrator's current context makes the integrator allocate its patch arrays when the hierarchy is initialized, including on new levels after regridding. The zero ghost width means the result needs only interior cell values. The final `false` excludes this derived field from restart storage; the application recomputes it from velocity.
+
+The working velocity uses the existing velocity variable with a separate context, `VORTICITY_WORK`. It has its own data index and one layer of ghost values around each patch. Registering that index describes the storage; the function below allocates and releases the actual working arrays.
+
+These contexts serve different purposes. The current context holds the completed solution; the integrator uses its new context for the state being advanced and scratch storage for temporary calculations. Our named working context identifies a separate copy for postprocessing.
+
+The writer registration gives the output its VisIt name, `computed_vorticity`. The periodic-boundary check matches the ghost-fill recipe below, which does not supply a physical boundary-condition object.
+
+### Read the completed velocity
+
+**Edit `kinetic_energy.cpp`:** Append `compute_vorticity` after the two energy functions. The following blocks form one function: enter them in order, keeping the function open until the last block.
+
+Start with its arguments and velocity lookup:
+
+```cpp
+void
+compute_vorticity(Pointer<PatchHierarchy<NDIM>> patch_hierarchy,
+                  Pointer<INSHierarchyIntegrator> ins_integrator,
+                  Pointer<CellVariable<NDIM, double>> vorticity_var,
+                  const int vorticity_idx,
+                  const int velocity_work_idx,
+                  const double data_time)
+{
+    static_assert(NDIM == 2, "This vorticity function is for two dimensions.");
+    auto* var_db = VariableDatabase<NDIM>::getDatabase();
+    const Pointer<SideVariable<NDIM, double>> velocity_var = ins_integrator->getVelocityVariable();
+    const int velocity_idx = var_db->mapVariableAndContextToIndex(
+        velocity_var, ins_integrator->getCurrentContext());
+```
+
+As in the energy calculation, the variable and current context identify the data index. Here the explicitly typed `SideVariable` also selects the side-centered-velocity overload of `curl`.
+
+### Allocate and copy the working data
+
+Continue the same function:
+
+```cpp
+    for (int ln = 0; ln <= patch_hierarchy->getFinestLevelNumber(); ++ln)
+        patch_hierarchy->getPatchLevel(ln)->allocatePatchData(velocity_work_idx, data_time);
+
+    HierarchySideDataOpsReal<NDIM, double> side_ops(
+        patch_hierarchy, 0, patch_hierarchy->getFinestLevelNumber());
+    side_ops.copyData(velocity_work_idx, velocity_idx, true);
+```
+
+Allocate the working velocity on every level at the requested physical time. `copyData` copies the current velocity into those arrays; its final `true` limits the copy to patch interiors.
+
+A derivative near a patch edge needs neighboring values. These extra entries are the ghost cells and we are responsible for filling them. We first copy velocity into separate working arrays because the subsequent coarse/fine synchronization can change data on coarse levels. All such changes should apply to the working copy.
+
+### Fill the ghost cells
+
+Continue with a ghost-fill transaction:
+
+```cpp
+    using Transaction = HierarchyGhostCellInterpolation::InterpolationTransactionComponent;
+    Transaction transaction(velocity_work_idx, "CONSERVATIVE_LINEAR_REFINE", false,
+                            "CONSERVATIVE_COARSEN", "NONE", false, nullptr);
+    HierarchyGhostCellInterpolation ghost_fill;
+    ghost_fill.initializeOperatorState(transaction, patch_hierarchy);
+    ghost_fill.fillData(data_time);
+```
+
+The [`HierarchyGhostCellInterpolation` documentation](https://ibamr.github.io/IBAMR-docs/ibamr/classIBTK_1_1HierarchyGhostCellInterpolation.html) describes these transactions. This one fills and synchronizes `velocity_work_idx` in place.
+
+| Setting | Purpose here |
+| --- | --- |
+| `CONSERVATIVE_LINEAR_REFINE` | Interpolate coarse-grid values where fine-grid ghost values are needed |
+| First `false` | Disable the separate quadratic coarse/fine interpolation option |
+| `CONSERVATIVE_COARSEN` | Synchronize working values from finer levels to coarser ones |
+| `NONE` | Apply no physical-boundary extrapolation |
+| Second `false` | Leave the consistent-type-2 option disabled |
+| `nullptr` | Supply no physical Robin boundary coefficients; this example is periodic |
+
+`initializeOperatorState` prepares transfers for the current patch hierarchy. `fillData(data_time)` performs the neighboring-patch and periodic exchanges and the selected coarse/fine transfers. This supplies the neighboring velocity values needed by the derivative stencil.
+
+### Compute the curl and release temporary storage
+
+Continue with the mathematical operation:
+
+```cpp
+    ins_integrator->getHierarchyMathOps()->curl(
+        vorticity_idx, vorticity_var, velocity_work_idx, velocity_var, nullptr, data_time);
+```
+
+Open the [`HierarchyMathOps` documentation](https://ibamr.github.io/IBAMR-docs/ibamr/classIBTK_1_1HierarchyMathOps.html) and find the `curl` overload with a `CellVariable` destination and a `SideVariable` source. Its first pair of arguments identifies the vorticity output; the next pair identifies the working velocity. For two-dimensional side-centered velocity, it computes the scalar curl at cell centers.
+
+The `nullptr` argument means no additional ghost-fill operation is requested inside `curl`: we have already filled the working data. The final argument is the physical evaluation time.
+
+Finish the function:
+
+```cpp
+    ghost_fill.deallocateOperatorState();
+    for (int ln = 0; ln <= patch_hierarchy->getFinestLevelNumber(); ++ln)
+        patch_hierarchy->getPatchLevel(ln)->deallocatePatchData(velocity_work_idx);
+}
+```
+
+Release the communication schedules, then the temporary velocity arrays. The registered vorticity result remains available for the visualization writer.
+
+This function constructs its transfers using the current hierarchy on each call, so it also works after regridding. The integrator maintains its own `HierarchyMathOps` as the hierarchy changes. An application that instead keeps a ghost-fill object between calls must update its schedules with `reinitializeOperatorState` after regridding.
+
+### Call the function before writing output
+
+**Edit `kinetic_energy.cpp`:** Immediately after the initial `iteration_num` and `loop_time` declarations, and before the initial visualization block, add this call. Original location: [`example.cpp`, lines 185–187](../examples/navier_stokes/ex1/example.cpp#L185-L187).
+
+```cpp
+compute_vorticity(patch_hierarchy, time_integrator, vorticity_var,
+                  vorticity_idx, velocity_work_idx, loop_time);
+```
+
+This fills the result before the time-zero frame is written.
+
+**Edit `kinetic_energy.cpp`:** Add the same call inside the time loop after `loop_time += dt` and the energy calculations, before the visualization output block. Original location: [`example.cpp`, line 209](../examples/navier_stokes/ex1/example.cpp#L209).
+
+```cpp
+compute_vorticity(patch_hierarchy, time_integrator, vorticity_var,
+                  vorticity_idx, velocity_work_idx, loop_time);
+```
+
+At this point `advanceHierarchy` has completed and the current context contains the updated velocity. The diagnostic is recomputed after each step, so any saved visualization frame has vorticity at the same time as its velocity.
+
+### Build, run, and plot the new field
+
+Rebuild the application:
+
+```bash
+cmake --build "$EXAMPLES_BUILD" --target navier_stokes-ex1-energy-2d --parallel 4
+```
+
+Prepare a fresh run with the baseline input:
+
+```bash
+cd "$EXAMPLES_BUILD/examples/navier_stokes/ex1"
+mkdir first-flow-vorticity
+cp first-flow/input2d first-flow-vorticity/
+cd first-flow-vorticity
+```
+
+**Edit the run copy of `input2d`:** Set `OUTPUT_OMEGA = FALSE` near the top of the file. Original location: [`input2d`, line 30](../examples/navier_stokes/ex1/input2d#L30). This turns off the application's built-in vorticity output. Your separately registered `computed_vorticity` is still written.
+
+Run the extended application:
+
+```bash
+../main2d_energy input2d
+```
+
+In VisIt, open `first-flow-vorticity/viz_INS2d/dumps.visit` in this example's build directory. Add a **Pseudocolor** plot of `computed_vorticity` and click **Draw**. Set the color limits to `-80` and `80` so that the colors retain the same meaning as you move through the saved times. Animate from time `0` to `1` and save a view of the field in the run directory.
+
+The computed field at time `1`:
+
+![Computed vorticity at time 1](figures/tutorial03-computed-vorticity.png)
+
+You have now added a computed field to the application: reading a completed solution, preparing neighboring values, applying a hierarchy operation, and registering the result for visualization.
+
 ## Before moving on
 
 This tutorial followed the fluid application from input settings through initialization and time advancement, computed kinetic energy by looping over levels, patches, and side indices, then used the documented `dot` operation to perform the same weighted calculation. You should have the modified `kinetic_energy.cpp`, the rebuilt `main2d_energy` executable, a `kinetic_energy_manual.curve` file, and a comparison run's `INS2d.log` containing both manual and `dot` results at matching times. Keep these results with their run inputs and visualization output.
+
+If you completed the vorticity extension, you should also have a `first-flow-vorticity` run with `computed_vorticity` available in VisIt.
 
 In [tutorial 04](04-elastic-loop.md), you will add an elastic rubber band to the fluid simulation and view the fluid and structure outputs together at matching times.

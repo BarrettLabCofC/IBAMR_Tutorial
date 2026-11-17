@@ -7,7 +7,7 @@ Follow the tutorials in order. Tutorials 00–11 cover the fundamentals; tutoria
 | [00. Find your way around](00-orientation.md) | Set up the repository and identify the source, input, executable, and build directory |
 | [01. Run a fluid simulation](01-first-run.md) | Run the baseline and higher-viscosity cases |
 | [02. See what the flow is doing](02-first-visualization.md) | View saved fields in VisIt and export comparison images |
-| [03. Compute kinetic energy](03-kinetic-energy.md) | Read the fluid application and add a diagnostic using patch loops and the weighted `dot` operation |
+| [03. Compute kinetic energy](03-kinetic-energy.md) | Read the fluid application and add a diagnostic using patch loops and the weighted `dot` operation; optionally compute and save vorticity |
 | [04. Put an elastic rubber band in the fluid](04-elastic-loop.md) | Run the rubber band, inspect its structure files, and synchronize fluid and structure plots |
 | [05. Change the model through its input](05-input-change.md) | Follow a stiffness override into the force calculation and compare separate runs |
 | [06. Use finer cells near the rubber band](06-refinement.md) | Inspect grid levels, match structure spacing, and compare resolutions |

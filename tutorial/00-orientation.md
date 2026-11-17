@@ -6,7 +6,7 @@ Build the fluid application first, then find your way around its input and sourc
 
 ## Before you start
 
-Start with an installed IBAMR v0.19.0 and a copy of this tutorial repository. The application source and inputs are supplied in this repository; you do not need to find IBAMR's own source checkout.
+Start with an installed IBAMR v0.19.0 and a copy of this tutorial repository. Use an installation with the features listed in the [repository prerequisites](../README.md#prerequisites): the initial CMake configuration checks features needed by the later examples as well as the first fluid application. The application source and inputs are supplied in this repository; you do not need to find IBAMR's own source checkout.
 
 Open a terminal in the example repository's top-level directory and set two names:
 

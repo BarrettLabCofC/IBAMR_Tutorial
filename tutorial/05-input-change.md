@@ -160,7 +160,7 @@ Note this is an existing library function. `R` is the current distance between t
 
 The returned number is the spring tension. `IBStandardForceGen` combines it with the direction between the points to apply equal and opposite forces, using the law introduced in tutorial 04. Doubling the stiffness doubles the tension for a given pair of point positions. Once the simulations evolve, their positions differ, so their forces need not remain in a two-to-one ratio.
 
-For more detail, see the [`IBStandardInitializer` documentation](https://ibamr.github.io/IBAMR-docs/ibamr/classIBAMR_1_1IBStandardInitializer.html) for structure input options and the [`IBStandardForceGen` documentation](https://ibamr.github.io/IBAMR-docs/ibamr/classIBAMR_1_1IBStandardForceGen.html) for force evaluation and `registerSpringForceFunction`. Changing the coefficient of this existing law is an input edit. Supplying a different C++ force law would require a source change and a rebuild; a later tutorial will do that.
+For more detail, see the [`IBStandardInitializer` documentation](https://ibamr.github.io/IBAMR-docs/ibamr/classIBAMR_1_1IBStandardInitializer.html) for structure input options and the [`IBStandardForceGen` documentation](https://ibamr.github.io/IBAMR-docs/ibamr/classIBAMR_1_1IBStandardForceGen.html) for force evaluation and `registerSpringForceFunction`. Changing the coefficient of this existing law is an input edit. [Tutorial 10](10-your-rubber-band-application.md) keeps this spring law and replaces the geometry files with C++ initialization callbacks. [Tutorial 13](13-cooks-membrane.md) modifies a structural surface-force callback in a different application.
 
 ### Check which other settings depend on K
 

@@ -247,7 +247,7 @@ regrid_cfl_interval = REGRID_CFL_INTERVAL
 
 In this version, that entry sets a threshold on accumulated fluid CFL numbers since the previous regrid. The integrator uses this as a motion estimate for deciding when the grid should be rebuilt. It is not a physical-time interval or a fixed number of steps. When regridding occurs, the points' current locations determine where finer patches are needed.
 
-Regridding can change patch boundaries and the data storage attached to those patches. The integrator resets the associated data-transfer operations for the new hierarchy. Neighboring patch data and coarse/fine interpolation supply the extra values needed near patch edges, called ghost cells. These exchanges are handled by the solver here; a later data-processing example will show how to request a ghost fill for a custom calculation.
+Regridding can change patch boundaries and the data storage attached to those patches. The integrator resets the associated data-transfer operations for the new hierarchy. Neighboring patch data and coarse/fine interpolation supply the extra values needed near patch edges, called ghost cells. These exchanges are handled by the solver here. The optional vorticity extension in [tutorial 03](03-kinetic-energy.md#further-exploration-compute-and-save-vorticity) shows how to fill ghost cells for an application-level diagnostic. [Tutorial 15](15-complex-fluids.md) shows why a constitutive strategy must also compute stress in ghost cells after the neighboring conformation values have been filled.
 
 If you later apply the kinetic-energy calculation from tutorial 03 to a refined fluid hierarchy, retain its hierarchy integration weights. Coarse cells covered by fine cells must not contribute a second copy of the same fluid region.
 

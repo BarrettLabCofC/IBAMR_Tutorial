@@ -103,7 +103,7 @@ Save the paired images and measurements with the corresponding runs.
 
 The source groups the structural parameters in `ModelData`:
 
-**Read:** [`example.cpp`, lines 56–59](../examples/IBFE/explicit/ex1/example.cpp#L56-L59) in `ModelData`. The excerpt shows `gamma` after your edit.
+**Read:** [`example.cpp`, lines 56–59](../examples/IBFE/explicit/ex1/example.cpp#L56-L59) in `ModelData`. The excerpt shows the supplied values; your edit changes `gamma` to `0.05`.
 
 ```cpp
 static const double R = 0.25;
