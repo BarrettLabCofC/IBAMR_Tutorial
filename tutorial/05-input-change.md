@@ -66,25 +66,42 @@ The log records the input database used by this run. Open `IB2d.log` and find `K
 
 ## Results
 
-### Compare at the same physical time
+### Compare both runs in one window
 
-Use the fluid-pressure and black rubber-band overlay from tutorial 04 for each run. The new sequences are `elastic-loop-stiff/viz_IB2d/dumps.visit` and `elastic-loop-stiff/viz_IB2d/lag_data.visit` under the example's build directory.
+Use one VisIt window for both pressure-and-rubber-band overlays. Keep the baseline on the left and move the stiffer case to the right.
 
-For the new run, create a **Time** database correlation for its fluid and structure files, using a distinct name such as `stiff_time`. Follow tutorial 04's correlation steps. Set the pressure limits to `-10` and `10` and use `hot_desaturated` for **both** runs. These shared limits replace the limits used for tutorial 04's single-run view.
+1. Start with the baseline overlay from tutorial 04: a **Pseudocolor** plot of `P` from `elastic-loop/viz_IB2d/dumps.visit` and a black **Mesh** plot of `curve2d_64_mesh` from `elastic-loop/viz_IB2d/lag_data.visit`.
+2. Open `elastic-loop-stiff/viz_IB2d/dumps.visit` and add another **Pseudocolor** plot of `P`. Open `elastic-loop-stiff/viz_IB2d/lag_data.visit` and add another black **Mesh** plot of `curve2d_64_mesh`. There should now be four plots in the plot list.
+3. Set both pressure plots to `hot_desaturated` with minimum `-10` and maximum `10`. These shared limits replace tutorial 04's single-run limits.
+4. Uncheck **Apply operators to all plots**. Select only the stiffer case's pressure plot. Choose **Operators → Transforms → Transform**, then open its attributes by double-clicking **Transform** in the plot list. Enable **Translate** and set `X = 1.2`, `Y = 0`, `Z = 0`, with rotation and scaling disabled. Click **Apply**.
+5. Apply the same **Transform** settings to the stiffer case's mesh plot. Click **Draw**, then reset the view to include both domains.
 
-Select physical time `0.6` in each run. The baseline has 121 saved states and the stiffer case has 241, because `Main.viz_dump_interval = 20` counts steps and the stiffer case takes smaller steps. Their final zero-based state indices are `120` and `240`. Comparing the same slider index would compare different physical times. Read the displayed time when switching between runs.
+The [Transform operator](https://visit-sphinx-github-user-manual.readthedocs.io/en/v3.3.2/using_visit/Operators/OperatorTypes/Transform_operator.html) changes the displayed coordinates. The baseline occupies `0 <= x <= 1` and the shifted case `1.2 <= x <= 2.2`. Translating both pressure and structure keeps their overlay aligned; the simulation data and pressure values are unchanged.
 
-![Baseline rubber band and pressure at time 0.6](figures/F03-baseline.png)
+### Match the physical times
 
-*Baseline, `K = 1.0`, at time `0.6`. Pressure limits are `[-10,10]`; the black mesh shows the rubber band.*
+A database correlation lets one slider control several databases. Its type determines which saved frames are shown together:
 
-![Stiffer rubber band and pressure at time 0.6](figures/F03-stiff.png)
+| Type | How it matches frames |
+| --- | --- |
+| **Padded index** | Matches frame numbers: first with first, second with second, and so on. Repeats the final frame of a shorter sequence after it ends. |
+| **Stretched index** | Spreads a shorter sequence across the longer one, repeating frames throughout so their beginnings and ends line up. Uses sequence position rather than physical time. |
+| **Time** | Uses the physical times stored in the databases. Suitable when simulations use different time steps or output intervals. |
+| **Cycle** | Uses the stored simulation cycle numbers, usually time-step numbers. Equal cycles can represent different physical times when step sizes differ. |
 
-*Stiffer rubber band, `K = 2.0`, at the same time and with the same view and pressure limits. Both figures use actual IBAMR output.*
+Use **Time** here because we want to compare the bands at the same physical time, even though the stiffer case takes more steps.
+
+Following tutorial 04's database-correlation steps, create one [**Time** correlation](https://visit-sphinx-github-user-manual.readthedocs.io/en/v3.3.1/using_visit/MultipleDatabaseAndWindows/Database_correlations.html) containing all four databases and name it `stiffness_time`. Select that correlation in the time controls and move to its final state. Select each plot and query **Time** to confirm that all four show `0.6`.
+
+The baseline has 121 saved states and the stiffer case has 241, because `Main.viz_dump_interval = 20` counts steps and the stiffer case takes smaller steps. Their individual final zero-based state indices are `120` and `240`. A Time correlation aligns physical times rather than matching these indices. Between shared saved times, it can reuse a frame from the less frequently saved baseline; use times saved by both runs for exact comparisons.
+
+![Baseline and stiffer rubber-band pressure overlays side by side at time 0.6](figures/F03-side-by-side.png)
+
+*Left: `K = 1.0`. Right: `K = 2.0`, translated by `1.2` in the x direction. Both show actual IBAMR output at time `0.6` with pressure limits `[-10,10]`.*
 
 ### Measure and save the comparison
 
-Select the structure mesh plot and use **Controls → Query → Spatial Extents**, as in tutorial 04. At time `0.6`, record the width, height, and height/width ratio for each run. The initial bounds should match because the vertex files are unchanged.
+Select the structure mesh plot and use **Controls → Query → Spatial Extents**, as in tutorial 04. At time `0.6`, record the width, height, and height/width ratio for each run. The translation adds `1.2` to the right-hand plot’s x bounds; subtracting its minimum from its maximum gives the same width as before translation. Both runs start with the same shape because their vertex files are unchanged.
 
 The checked runs give these values at time `0.6`:
 
@@ -95,7 +112,7 @@ The checked runs give these values at time `0.6`:
 
 Both start with height/width approximately `1.9600`. At time `0.6`, the baseline band is taller than it is wide, while the stiffer band is wider than it is tall. Play the two sequences to see how the stiffness changes the timing of the motion.
 
-Save the measurements alongside each run's input and log, including `K` and physical time. Save a PNG of each final overlay using the same view, color table, and limits. Use names such as `band-K1-pressure-t0.6.png` and `band-K2-pressure-t0.6.png`.
+Save the measurements alongside each run’s input and log, including `K` and physical time. Save the combined view as `band-stiffness-comparison-t0.6.png`. Use **Controls → Annotation** to label the left and right cases with their `K` values and show the physical time. Since the pressure limits are shared, one pressure legend is sufficient; hide the second in that pressure plot’s attributes.
 
 ## The input and program
 
@@ -194,6 +211,6 @@ This is already the value in the supplied tutorial input. It makes both simulati
 
 ## Before moving on
 
-This tutorial changed spring stiffness through the input, traced the override into the force calculation, and compared separate runs at the same physical time. You should have the original `elastic-loop` run, a new `elastic-loop-stiff` run using the same executable, and comparison images and shape measurements retained with their respective inputs and logs.
+This tutorial changed spring stiffness through the input, traced the override into the force calculation, and compared separate runs at the same physical time. You should have the original `elastic-loop` run, a new `elastic-loop-stiff` run using the same executable, a side-by-side comparison image, and shape measurements retained with the inputs and logs.
 
 [Tutorial 06](06-refinement.md) will use this rubber-band model to introduce finer fluid cells and matching structure-point spacing. You will inspect the grid and compare a measurement while keeping the physical model fixed.
